@@ -38,6 +38,11 @@ if ( ! defined( 'WPINC' ) ) {
 define( 'FBF_WHEEL_SEARCH_VERSION', '1.0.0' );
 
 /**
+ * Current database version.
+ */
+define( 'FBF_WHEEL_SEARCH_DB_VERSION', '1.0.0' );
+
+/**
  * The code that runs during plugin activation.
  * This action is documented in includes/class-fbf-wheel-search-activator.php
  */

@@ -40,6 +40,15 @@ class Fbf_Wheel_Search_Public {
 	 */
 	private $version;
 
+    /**
+     * The options name to be used in this plugin
+     *
+     * @since  	1.0.0
+     * @access 	private
+     * @var  	string 		$option_name 	Option name of this plugin
+     */
+    private $option_name = 'fbf_wheel_search';
+
 	/**
 	 * Initialize the class and set its properties.
 	 *
@@ -98,6 +107,82 @@ class Fbf_Wheel_Search_Public {
 
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/fbf-wheel-search-public.js', array( 'jquery' ), $this->version, false );
 
+        wp_localize_script( $this->plugin_name, 'fbf_wheel_search_ajax_object', [
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'ajax_nonce' => wp_create_nonce($this->option_name),
+        ]);
+
 	}
 
+    public function wheel_search_widget($atts)
+    {
+        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-fbf-wheel-search-shortcodes.php';
+        $sc = new Fbf_Wheel_Search_Shortcodes();
+        echo $sc->wheel_search($atts);
+	}
+
+    public static function manufacturers_dropdown()
+    {
+        global $wpdb;
+        $table = $wpdb->prefix . 'fbf_vehicle_manufacturers';
+        $sql = "SELECT * FROM $table WHERE enabled = 1";
+        $manufacturers = $wpdb->get_results($sql);
+        $html = '';
+        $html.= sprintf('<select class="form-control mb-4" id="%s">', 'fbf-wheel-search-manufacturer-select');
+        $html.= sprintf('<option value="">Select manufacturer</option>');
+        if($manufacturers!==false){
+            foreach($manufacturers as $manufacturer){
+                $html.= sprintf('<option value="%s">%s</option>', $manufacturer->boughto_id, $manufacturer->display_name);
+            }
+        }
+        $html.= '</select>';
+        return $html;
+	}
+
+    public static function chasis_dropdown()
+    {
+        $html = sprintf('<select class="form-control mb-0" id="%s">', 'fbf-wheel-search-chasis-select');
+        $html.= sprintf('<option value="">Select Chasis</option>');
+        $html.= '</select>';
+        return $html;
+	}
+
+    public function fbf_wheel_search_get_chasis()
+    {
+        check_ajax_referer($this->option_name, 'ajax_nonce');
+        $id = filter_var($_POST['manufacturer_id'], FILTER_SANITIZE_STRING);
+        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-fbf-wheel-search-boughto-api.php';
+        $api = new Fbf_Wheel_Search_Boughto_Api($this->option_name, $this->plugin_name);
+        $data = $api->get_chasis($id);
+
+        if(is_wp_error($data)){
+            echo json_encode([
+                'status' => 'error',
+                'error' => 'Boughto API returned a WP_error',
+                'wp_error' => $data
+            ]);
+        }else{
+            if(array_key_exists('error', $data)){
+                echo json_encode([
+                    'status' => 'error',
+                    'error' => $data['error']['message'],
+                    'code' => $data['error']['code']
+                ]);
+            }else{
+                echo json_encode([
+                    'status' => 'success',
+                    'manufacturer_id' => $id,
+                    'data' => $data
+                ]);
+            }
+        }
+        die();
+	}
+
+    public function fbf_wheel_search_query_vars($vars)
+    {
+        $vars[] = "chasis";
+        $vars[] = "vehicle";
+        return $vars;
+    }
 }

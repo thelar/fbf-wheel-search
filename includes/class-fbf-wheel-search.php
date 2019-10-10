@@ -153,10 +153,25 @@ class Fbf_Wheel_Search {
 	private function define_admin_hooks() {
 
 		$plugin_admin = new Fbf_Wheel_Search_Admin( $this->get_plugin_name(), $this->get_version() );
+		$plugin_public = new Fbf_Wheel_Search_Public( $this->get_plugin_name(), $this->get_version() );
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
+        $this->loader->add_action( 'admin_init', $plugin_admin, 'register_settings' );
+        $this->loader->add_action( 'admin_menu', $plugin_admin, 'add_menu_page' );
+        $this->loader->add_action( 'admin_post_fbf_wheel_search_sync_manufacturers', $plugin_admin, 'fbf_wheel_search_sync_manufacturers');
+        $this->loader->add_action( 'admin_post_fbf_wheel_search_enable_manufacturer', $plugin_admin, 'fbf_wheel_search_enable_manufacturer');
+        $this->loader->add_action( 'admin_notices', $plugin_admin, 'fbf_wheel_search_admin_notices');
 
+        //Filters
+        $this->loader->add_filter('query_vars', $plugin_public, 'fbf_wheel_search_query_vars');
+
+        //Ajax
+        $this->loader->add_action( 'wp_ajax_fbf_wheel_search_get_chasis', $plugin_public, 'fbf_wheel_search_get_chasis' );
+        $this->loader->add_action( 'wp_ajax_nopriv_fbf_wheel_search_get_chasis', $plugin_public, 'fbf_wheel_search_get_chasis' );
+
+        //Shortcodes
+        $this->loader->add_shortcode('fbf_wheel_search_widget', $plugin_public, 'wheel_search_widget');
 	}
 
 	/**
