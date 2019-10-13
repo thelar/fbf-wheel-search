@@ -164,7 +164,7 @@ class Fbf_Wheel_Search {
         $this->loader->add_action( 'admin_notices', $plugin_admin, 'fbf_wheel_search_admin_notices');
 
         //Filters
-        $this->loader->add_filter('query_vars', $plugin_public, 'fbf_wheel_search_query_vars');
+        //$this->loader->add_filter('query_vars', $plugin_public, 'fbf_wheel_search_query_vars'); - now loaded in theme
 
         //Ajax
         $this->loader->add_action( 'wp_ajax_fbf_wheel_search_get_chasis', $plugin_public, 'fbf_wheel_search_get_chasis' );

@@ -179,10 +179,10 @@ class Fbf_Wheel_Search_Public {
         die();
 	}
 
-    public function fbf_wheel_search_query_vars($vars)
+    /*public function fbf_wheel_search_query_vars($vars)
     {
         $vars[] = "chasis";
         $vars[] = "vehicle";
         return $vars;
-    }
+    }*/
 }

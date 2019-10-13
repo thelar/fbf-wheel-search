@@ -86,7 +86,8 @@
 		});
 
 		$chasis_select.on('change', function(e){
-			let url = '/wheel-search/?chasis=' + $(this).val() + '&vehicle=' + encodeURIComponent($manufacturer_select.find(':selected').text() + ' ' + $chasis_select.find(':selected').text());
+			let url = '/wheel-search/chassis/' + $(this).val() + '/vehicle/' + encodeURIComponent($manufacturer_select.find(':selected').text() + ' ' + $chasis_select.find(':selected').text());
+			console.log(url);
 			window.location.href = url;
 		});
 
