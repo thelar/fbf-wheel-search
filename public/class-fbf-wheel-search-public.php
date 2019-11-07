@@ -155,6 +155,9 @@ class Fbf_Wheel_Search_Public {
         $api = new Fbf_Wheel_Search_Boughto_Api($this->option_name, $this->plugin_name);
         $data = $api->get_chasis($id);
 
+        //Store the manufacturer ID in session because we will need it
+        WC()->session->set('fbf_manufacturer_id', $id);
+
         if(is_wp_error($data)){
             echo json_encode([
                 'status' => 'error',
