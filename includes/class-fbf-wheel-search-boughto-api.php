@@ -134,6 +134,12 @@ class Fbf_Wheel_Search_Boughto_Api
             if(!is_wp_error($response)&&is_array($response)){
                 $data = json_decode(wp_remote_retrieve_body($response), true);
                 set_transient($key, $data, WEEK_IN_SECONDS);
+
+                //Set a transient that matches a chassis to manufacturer for recall in upsells
+                foreach($data as $chassis){
+                    $key = "boughto_chassis_{$chassis['id']}_manufacturer";
+                    set_transient($key, $manu_id, WEEK_IN_SECONDS);
+                }
                 return $data;
             }else{
                 return $response;
