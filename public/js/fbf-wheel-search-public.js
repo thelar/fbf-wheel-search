@@ -42,19 +42,19 @@
 
 		$manufacturer_select.on('change', function(e) {
 			let id = $(this).attr('id');
-			console.log('id:' + id);
+			//console.log('id:' + id);
 			if(id==='fbf-wheel-search-manufacturer-select'){
 				$chasis_select = $('#fbf-wheel-search-chasis-select');
 			}else if(id==='fbf-package-search-manufacturer-select'){
 				$chasis_select = $('#fbf-package-search-chasis-select');
 			}
-			populate_chasis($chasis_select, $(this).val());
+			window.populate_chasis($chasis_select, $(this).val(), is_packages_page, false);
 
 		});
 
-		function populate_chasis($chasis_select, manufacturer_id){
-			console.log('manufacturer change');
-			console.log('Value: ' + manufacturer_id);
+		window.populate_chasis = function ($chasis_select, manufacturer_id, is_packages_page, selected){
+			//console.log('manufacturer change');
+			//console.log('Value: ' + manufacturer_id);
 
 			$chasis_select.empty();
 			$chasis_select.append('<option>Please wait...</option>');
@@ -73,7 +73,6 @@
 					if(response.status==='success'){
 						let option = '<option value="">Select Chasis</option>';
 						$.each(response.data, function(i, e){
-							console.log(e);
 							let start_year;
 							let end_year;
 							let start;
@@ -92,7 +91,11 @@
 							}
 							let id = e.id;
 							let text = e.name + ' ' + start_year + ' - ' + end_year;
-							option+= '<option value="' + id + '">' + text + '</option>';
+							let sel = '';
+							if(id==selected){
+								sel = ' selected';
+							}
+							option+= '<option value="' + id + '"' + sel +'>' + text + '</option>';
 						});
 						$chasis_select.empty();
 						$chasis_select.append(option);
@@ -108,14 +111,14 @@
 					let $manu;
 					if($(this).attr('id')==='fbf-wheel-search-chasis-select'){
 						$manu = $('#fbf-wheel-search-manufacturer-select');
-						console.log($manufacturer_select.val());
+						//console.log($manufacturer_select.val());
 						let url = '/wheel-search/chassis/' + $(this).val() + '/vehicle/' + encodeURIComponent($manu.find(':selected').text() + ' ' + $chasis_select.find(':selected').text()) + '/';
-						console.log(url);
+						//console.log(url);
 						window.location.href = url;
 					}else if($(this).attr('id')==='fbf-package-search-chasis-select'){
 						$manu = $('#fbf-package-search-manufacturer-select');
 						let url = '/tyre-wheel-packages/chassis/' + $(this).val() + '/vehicle/' + $manu.val() + '/';
-						console.log(url);
+						//console.log(url);
 						window.location.href = url;
 					}
 				});
