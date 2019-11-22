@@ -121,6 +121,13 @@ class Fbf_Wheel_Search_Public {
         echo $sc->wheel_search($atts);
 	}
 
+    public function package_search_widget($atts)
+    {
+        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-fbf-wheel-search-shortcodes.php';
+        $sc = new Fbf_Wheel_Search_Shortcodes();
+        echo $sc->package_search($atts);
+	}
+
     public static function manufacturers_dropdown()
     {
         global $wpdb;
@@ -139,9 +146,35 @@ class Fbf_Wheel_Search_Public {
         return $html;
 	}
 
+    public static function manufacturers_dropdown_package()
+    {
+        global $wpdb;
+        $table = $wpdb->prefix . 'fbf_vehicle_manufacturers';
+        $sql = "SELECT * FROM $table WHERE enabled = 1";
+        $manufacturers = $wpdb->get_results($sql);
+        $html = '';
+        $html.= sprintf('<select class="form-control mb-4" id="%s">', 'fbf-package-search-manufacturer-select');
+        $html.= sprintf('<option value="">Select manufacturer</option>');
+        if($manufacturers!==false){
+            foreach($manufacturers as $manufacturer){
+                $html.= sprintf('<option value="%s">%s</option>', $manufacturer->boughto_id, $manufacturer->display_name);
+            }
+        }
+        $html.= '</select>';
+        return $html;
+	}
+
     public static function chasis_dropdown()
     {
         $html = sprintf('<select class="form-control mb-0" id="%s">', 'fbf-wheel-search-chasis-select');
+        $html.= sprintf('<option value="">Select Chasis</option>');
+        $html.= '</select>';
+        return $html;
+	}
+
+    public static function chasis_dropdown_package()
+    {
+        $html = sprintf('<select class="form-control mb-0" id="%s">', 'fbf-package-search-chasis-select');
         $html.= sprintf('<option value="">Select Chasis</option>');
         $html.= '</select>';
         return $html;
