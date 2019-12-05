@@ -136,7 +136,7 @@ class Fbf_Wheel_Search_Public {
         $manufacturers = $wpdb->get_results($sql);
         $html = '';
         $html.= sprintf('<select class="form-control mb-4" id="%s">', 'fbf-wheel-search-manufacturer-select');
-        $html.= sprintf('<option value="">Select manufacturer</option>');
+        $html.= sprintf('<option value="">Manufacturer</option>');
         if($manufacturers!==false){
             foreach($manufacturers as $manufacturer){
                 $html.= sprintf('<option value="%s">%s</option>', $manufacturer->boughto_id, $manufacturer->display_name);
@@ -154,7 +154,7 @@ class Fbf_Wheel_Search_Public {
         $manufacturers = $wpdb->get_results($sql);
         $html = '';
         $html.= sprintf('<select class="form-control mb-4" id="%s">', 'fbf-package-search-manufacturer-select');
-        $html.= sprintf('<option value="">Select manufacturer</option>');
+        $html.= sprintf('<option value="">Manufacturer</option>');
         if($manufacturers!==false){
             foreach($manufacturers as $manufacturer){
                 $html.= sprintf('<option value="%s">%s</option>', $manufacturer->boughto_id, $manufacturer->display_name);
