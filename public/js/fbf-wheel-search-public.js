@@ -30,6 +30,7 @@
 	 */
 
 	$(function() {
+		console.log('here');
 		let $manufacturer_select = $('#fbf-wheel-search-manufacturer-select, #fbf-package-search-manufacturer-select');
 		$manufacturer_select.val($manufacturer_select.find('option:first').val());
 		let $chasis_select;
@@ -53,8 +54,8 @@
 		});
 
 		window.populate_chasis = function ($chasis_select, manufacturer_id, is_packages_page, selected){
-			//console.log('manufacturer change');
-			//console.log('Value: ' + manufacturer_id);
+			console.log('manufacturer change');
+			console.log('Value: ' + manufacturer_id);
 
 			$chasis_select.empty();
 			$chasis_select.append('<option>Please wait...</option>');
@@ -123,7 +124,7 @@
 					}
 				});
 			}
-		}
+		};
 	});
 
 })( jQuery );
