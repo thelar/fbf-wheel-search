@@ -72,7 +72,7 @@
 				dataType: 'json',
 				success: function(response){
 					if(response.status==='success'){
-						let option = '<option value="">Chasis</option>';
+						let option = '<option value="">Select chassis</option>';
 						$.each(response.data, function(i, e){
 							let start_year;
 							let end_year;
