@@ -167,7 +167,7 @@ class Fbf_Wheel_Search_Public {
     public static function chasis_dropdown()
     {
         $html = sprintf('<select class="form-control mb-0" id="%s">', 'fbf-wheel-search-chasis-select');
-        $html.= sprintf('<option value="">Select Chasis</option>');
+        $html.= sprintf('<option value="">Select Chassis</option>');
         $html.= '</select>';
         return $html;
 	}
@@ -175,7 +175,7 @@ class Fbf_Wheel_Search_Public {
     public static function chasis_dropdown_package()
     {
         $html = sprintf('<select class="form-control mb-0" id="%s">', 'fbf-package-search-chasis-select');
-        $html.= sprintf('<option value="">Select Chasis</option>');
+        $html.= sprintf('<option value="">Select Chassis</option>');
         $html.= '</select>';
         return $html;
 	}
