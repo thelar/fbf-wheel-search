@@ -188,8 +188,23 @@ class Fbf_Wheel_Search_Public {
         $api = new Fbf_Wheel_Search_Boughto_Api($this->option_name, $this->plugin_name);
         $data = $api->get_chasis($id);
 
+        if(!empty($data)){
+            $i = 0;
+            foreach($data as $chassis){
+                $ds = DateTime::createFromFormat(DATE_ISO8601, $chassis['year_start']);
+                $de = DateTime::createFromFormat(DATE_ISO8601, $chassis['year_end']);
+                if($ds){
+                    $data[$i]['ds'] = $ds->format('Y');
+                }
+                if($de){
+                    $data[$i]['de'] = $de->format('Y');
+                }
+                $i++;
+            }
+        }
+
         usort($data, function($a, $b){
-            return [$a['name'], $b['year_end']] <=> [$b['name'], $a['year_end']];
+            return [$a['name'], $b['ds']] <=> [$b['name'], $a['ds']];
         });
 
         //Store the manufacturer ID in session because we will need it
