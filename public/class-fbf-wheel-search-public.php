@@ -191,13 +191,17 @@ class Fbf_Wheel_Search_Public {
         if(!empty($data)){
             $i = 0;
             foreach($data as $chassis){
-                $ds = DateTime::createFromFormat(DATE_ISO8601, $chassis['year_start']);
-                $de = DateTime::createFromFormat(DATE_ISO8601, $chassis['year_end']);
-                if($ds){
-                    $data[$i]['ds'] = $ds->format('Y');
-                }
-                if($de){
-                    $data[$i]['de'] = $de->format('Y');
+                if(strpos(strtolower($chassis['name']), 'hidden')===false){
+                    $ds = DateTime::createFromFormat(DATE_ISO8601, $chassis['year_start']);
+                    $de = DateTime::createFromFormat(DATE_ISO8601, $chassis['year_end']);
+                    if($ds){
+                        $data[$i]['ds'] = $ds->format('Y');
+                    }
+                    if($de){
+                        $data[$i]['de'] = $de->format('Y');
+                    }
+                }else{
+                    unset($data[$i]);
                 }
                 $i++;
             }
