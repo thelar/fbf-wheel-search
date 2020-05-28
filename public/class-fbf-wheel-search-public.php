@@ -207,9 +207,12 @@ class Fbf_Wheel_Search_Public {
             }
         }
 
-        usort($data, function($a, $b){
-            return [$a['name'], $b['ds']] <=> [$b['name'], $a['ds']];
-        });
+        if(!empty($data)){
+            usort($data, function($a, $b){
+                return [$a['name'], $b['ds']] <=> [$b['name'], $a['ds']];
+            });
+        }
+
 
         //Store the manufacturer ID in session because we will need it
         WC()->session->set('fbf_manufacturer_id', $id);
@@ -219,6 +222,12 @@ class Fbf_Wheel_Search_Public {
                 'status' => 'error',
                 'error' => 'Boughto API returned a WP_error',
                 'wp_error' => $data
+            ]);
+        }else if($data===false){
+            echo json_encode([
+                'status' => 'error',
+                'error' => 'Boughto API returned $data as false',
+                'data' => $data
             ]);
         }else{
             if(array_key_exists('error', $data)){
