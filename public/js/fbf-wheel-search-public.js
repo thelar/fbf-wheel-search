@@ -101,7 +101,7 @@
 						$chasis_select.empty();
 						$chasis_select.append(option);
 					}else{
-						alert('There was an error: ' + response.error);
+						console.log('There was an error: ' + response.error);
 					}
 				},
 			});
