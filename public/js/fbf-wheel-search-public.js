@@ -118,7 +118,7 @@
 						window.location.href = url;
 					}else if($(this).attr('id')==='fbf-package-search-chasis-select'){
 						$manu = $('#fbf-package-search-manufacturer-select');
-						let url = '/tyre-wheel-packages/chassis/' + $(this).val() + '/vehicle/' + $manu.val() + '/';
+						let url = '/tyre-wheel-packages/chassis/' + $(this).val() + '/vehicle/' + $manu.val() + '/name/' + encodeURIComponent($manu.find(':selected').text() + ' ' + $chasis_select.find(':selected').text()) + '/';
 						//console.log(url);
 						window.location.href = url;
 					}
