@@ -115,6 +115,7 @@ class Fbf_Wheel_Search {
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-fbf-wheel-search-admin.php';
+        require_once plugin_dir_path(dirname(__FILE__)) . 'admin/class-fbf-wheel-search-api.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the public-facing
@@ -153,6 +154,7 @@ class Fbf_Wheel_Search {
 	private function define_admin_hooks() {
 
 		$plugin_admin = new Fbf_Wheel_Search_Admin( $this->get_plugin_name(), $this->get_version() );
+		$plugin_api = new Fbf_Wheel_Search_Api( $this->get_plugin_name(), $this->get_version() );
 		$plugin_public = new Fbf_Wheel_Search_Public( $this->get_plugin_name(), $this->get_version() );
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
