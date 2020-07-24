@@ -179,106 +179,110 @@ class Fbf_Wheel_Search_Api
     {
         global $wp_query;
         $response = [];
-        $chassis = filter_var($_REQUEST['chassis'], FILTER_SANITIZE_STRING);
-        $product_id = filter_var($_REQUEST['wheel_id'], FILTER_SANITIZE_STRING);
 
-        $wheel = false;
-        $steel_wheel = false;
+        if(isset($_REQUEST['chassis'])&&isset($_REQUEST['wheel_id'])){
+            $chassis = filter_var($_REQUEST['chassis'], FILTER_SANITIZE_STRING);
+            $product_id = filter_var($_REQUEST['wheel_id'], FILTER_SANITIZE_STRING);
 
-        $product = wc_get_product($product_id);
-        $category = $product->get_category_ids()[0];
-        if($category){
-            $term = get_term_by('id', $category, 'product_cat');
-            if($term->name=='Alloy Wheel'||$term->name=='Steel Wheel'){
-                $wheel = $product;
+            $wheel = false;
+            $steel_wheel = false;
 
-                if($term->name=='Steel Wheel'){
-                    $steel_wheel = $product;
+            $product = wc_get_product($product_id);
+            $category = $product->get_category_ids()[0];
+            if($category){
+                $term = get_term_by('id', $category, 'product_cat');
+                if($term->name=='Alloy Wheel'||$term->name=='Steel Wheel'){
+                    $wheel = $product;
+
+                    if($term->name=='Steel Wheel'){
+                        $steel_wheel = $product;
+                    }
                 }
+            }
+
+            //Look for wheel nuts here - can only offer them when we've searched for a wheel and have the chassis id
+            if($chassis && $chassis != 'undefined'){
+                require_once plugin_dir_path(WP_PLUGIN_DIR . '/fbf-wheel-search/fbf-wheel-search.php') . 'includes/class-fbf-wheel-search-boughto-api.php';
+                $api = new \Fbf_Wheel_Search_Boughto_Api('fbf_wheel_search', 'fbf-wheel-search');
+
+                //Retrieve the selected manufacturer data
+                //Get the manufacturer id first via a transient, then by session if not set
+                $trans_key = "boughto_chassis_{$chassis}_manufacturer";
+                if(get_transient($trans_key)) {
+                    $manufacturer_id = get_transient($trans_key);
+                }else{
+                    $manufacturer_id = WC()->session->get('fbf_manufacturer_id');
+                }
+                $all_chassis = $api->get_chasis($manufacturer_id);
+                $index = array_search($chassis, array_column($all_chassis, 'id'));
+                $chassis_data = $all_chassis[$index];
+
+                //Retrieve the wheel data
+                $all_wheel_data = $api->get_wheels($chassis)['data'];
+                $sku = $wheel->get_sku();
+                $index = array_search($sku, array_column($all_wheel_data, 'ean'));
+                $wheel_data = $all_wheel_data[$index];
+
+                if(!empty($wheel_data)&&!empty($chassis_data)){
+                    //We can gather the bits of data for the wheel nut skus:
+                    $sku = sprintf($chassis_data['nutBolt_thread_type'] . $chassis_data['nut_or_bolt'] . $chassis_data['nut_bolt_hex'] . '%1$s', $wheel_data['seat_type']=='Flat'?'FLAT':'');
+                    $nuts = [
+                        'title' => 'Wheel nuts for your wheel and vehicle:',
+                        'text' => sprintf('Display Accessories whose SKU\'s begin with: <strong>' . $chassis_data['nutBolt_thread_type'] . $chassis_data['nut_or_bolt'] . $chassis_data['nut_bolt_hex'] . '%1$s' . '</strong>', $wheel_data['seat_type']=='Flat'?'FLAT':''),
+                        'item' => [
+                            'nutBolt_thread_type' => $chassis_data['nutBolt_thread_type'],
+                            'nut_or_bolt' => $chassis_data['nut_or_bolt'],
+                            'nub_bolt_hex' => $chassis_data['nut_bolt_hex'],
+                            'family_tags' => $wheel_data['family']['tags'][0],
+                            'seat_type' => $wheel_data['seat_type'],
+                            'sku' => $sku
+                        ],
+                    ];
+                    if($items = $this->get_upsell_items($chassis, $sku, 1)){
+                        $nuts['items'] = $items;
+                    }
+                    $response[] = $nuts;
+                }
+
+                if($steel_wheel){
+                    $sku = 'centrecap' . $wheel_data['centreBore'];
+                    $caps = [
+                        'title' => 'Centre cap for your wheel and vehicle:',
+                        'text' => 'Display Accessories whose SKU\'s begin with: <strong>' . $sku . '</strong>',
+                        'item' => [
+                            'prefix' => 'centrecap',
+                            'centreBore' => $wheel_data['centreBore'],
+                            'sku' => $sku,
+                        ]
+                    ];
+                    if($items = $this->get_upsell_items($chassis, $sku, 1)){
+                        $caps['items'] = $items;
+                    }
+                    $response[] = $caps;
+                }
+            }
+
+            //Generic upsells
+            $generic_upsells = get_field('upsells', 'options');
+            $generic_upsell_ids = [];
+            if($generic_upsells){
+                $generic = [
+                    'title' => 'Generic upsells:',
+                ];
+                foreach($generic_upsells as $upsell){
+                    $generic_upsell_ids[] = $upsell->ID;
+                    $generic['item'][] = [
+                        'id' => $upsell->ID,
+                        'title' => get_the_title($upsell->ID),
+                    ];
+                }
+                if($items = $this->get_upsell_items($chassis, false, 1, $generic_upsell_ids)){
+                    $generic['items'] = $items;
+                }
+                $response[] = $generic;
             }
         }
 
-        //Look for wheel nuts here - can only offer them when we've searched for a wheel and have the chassis id
-        if($chassis && $chassis != 'undefined'){
-            require_once plugin_dir_path(WP_PLUGIN_DIR . '/fbf-wheel-search/fbf-wheel-search.php') . 'includes/class-fbf-wheel-search-boughto-api.php';
-            $api = new \Fbf_Wheel_Search_Boughto_Api('fbf_wheel_search', 'fbf-wheel-search');
-
-            //Retrieve the selected manufacturer data
-            //Get the manufacturer id first via a transient, then by session if not set
-            $trans_key = "boughto_chassis_{$chassis}_manufacturer";
-            if(get_transient($trans_key)) {
-                $manufacturer_id = get_transient($trans_key);
-            }else{
-                $manufacturer_id = WC()->session->get('fbf_manufacturer_id');
-            }
-            $all_chassis = $api->get_chasis($manufacturer_id);
-            $index = array_search($chassis, array_column($all_chassis, 'id'));
-            $chassis_data = $all_chassis[$index];
-
-            //Retrieve the wheel data
-            $all_wheel_data = $api->get_wheels($chassis)['data'];
-            $sku = $wheel->get_sku();
-            $index = array_search($sku, array_column($all_wheel_data, 'ean'));
-            $wheel_data = $all_wheel_data[$index];
-
-            if(!empty($wheel_data)&&!empty($chassis_data)){
-                //We can gather the bits of data for the wheel nut skus:
-                $sku = sprintf($chassis_data['nutBolt_thread_type'] . $chassis_data['nut_or_bolt'] . $chassis_data['nut_bolt_hex'] . '%1$s', $wheel_data['seat_type']=='Flat'?'FLAT':'');
-                $nuts = [
-                    'title' => 'Wheel nuts for your wheel and vehicle:',
-                    'text' => sprintf('Display Accessories whose SKU\'s begin with: <strong>' . $chassis_data['nutBolt_thread_type'] . $chassis_data['nut_or_bolt'] . $chassis_data['nut_bolt_hex'] . '%1$s' . '</strong>', $wheel_data['seat_type']=='Flat'?'FLAT':''),
-                    'item' => [
-                        'nutBolt_thread_type' => $chassis_data['nutBolt_thread_type'],
-                        'nut_or_bolt' => $chassis_data['nut_or_bolt'],
-                        'nub_bolt_hex' => $chassis_data['nut_bolt_hex'],
-                        'family_tags' => $wheel_data['family']['tags'][0],
-                        'seat_type' => $wheel_data['seat_type'],
-                        'sku' => $sku
-                    ],
-                ];
-                if($items = $this->get_upsell_items($chassis, $sku, 1)){
-                    $nuts['items'] = $items;
-                }
-                $response[] = $nuts;
-            }
-
-            if($steel_wheel){
-                $sku = 'centrecap' . $wheel_data['centreBore'];
-                $caps = [
-                    'title' => 'Centre cap for your wheel and vehicle:',
-                    'text' => 'Display Accessories whose SKU\'s begin with: <strong>' . $sku . '</strong>',
-                    'item' => [
-                        'prefix' => 'centrecap',
-                        'centreBore' => $wheel_data['centreBore'],
-                        'sku' => $sku,
-                    ]
-                ];
-                if($items = $this->get_upsell_items($chassis, $sku, 1)){
-                    $caps['items'] = $items;
-                }
-                $response[] = $caps;
-            }
-        }
-
-        //Generic upsells
-        $generic_upsells = get_field('upsells', 'options');
-        $generic_upsell_ids = [];
-        if($generic_upsells){
-            $generic = [
-                'title' => 'Generic upsells:',
-            ];
-            foreach($generic_upsells as $upsell){
-                $generic_upsell_ids[] = $upsell->ID;
-                $generic['item'][] = [
-                    'id' => $upsell->ID,
-                    'title' => get_the_title($upsell->ID),
-                ];
-            }
-            if($items = $this->get_upsell_items($chassis, false, 1, $generic_upsell_ids)){
-                $generic['items'] = $items;
-            }
-            $response[] = $generic;
-        }
 
         $this->render_json($response);
     }
