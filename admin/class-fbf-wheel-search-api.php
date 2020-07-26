@@ -126,6 +126,23 @@ class Fbf_Wheel_Search_Api
                 $product_id = wc_get_product_id_by_sku($wheel['ean']);
                 if ($product_id) {
                     $product = wc_get_product($product_id);
+
+                    //Category
+                    $category_term = get_term_by('id', $product->get_category_ids()[0], 'product_cat');
+                    $category = $category_term->name;
+
+                    //Brand logo
+                    $brand_logo = '';
+                    $brand_terms = get_the_terms($product_id, 'pa_brand-name');
+
+                    foreach($brand_terms as $brand_term){ //In reality there's only ever going to be 1 brand per product
+                        $st = $brand_term->taxonomy . '_' . (string)$brand_term->term_id;
+                        if(!empty(get_field('brand_logo', $st))){
+                            $link = get_term_link($brand_term->term_id, 'pa_brand-name');
+                            $logo = get_field('brand_logo', $st)['sizes']['fbf-300-x'];
+                            $brand_logo = sprintf('<a href="%3$s"><img src="%1$s" alt="%2$s"/></a>', $logo, $brand_term->name, $link);
+                        }
+                    }
                     if ($product->is_in_stock()) {
                         $skus_ids[] = [
                             //Add all the product data here
@@ -133,16 +150,24 @@ class Fbf_Wheel_Search_Api
                             'name' => get_the_title($product_id),
                             'price' => number_format(wc_get_price_including_tax($product), 2),
                             'currency' => get_woocommerce_currency_symbol(),
-                            'sku' => $product->get_sku(),
                             'image' => has_post_thumbnail($product_id)?wp_get_attachment_image_src(get_post_thumbnail_id($product_id), 'fbf-300-x')[0]:wc_placeholder_img_src('fbf-300-x'),
                             'stock' => $product->get_stock_quantity(),
+                            'brand' => [
+                                'name' => $brand_term->name,
+                                'logo' => $brand_logo
+                            ],
                             'details' => [
+                                'brand_name' => $product->get_attribute('pa_brand-name'),
+                                'product_type' => $category,
                                 'color' => $product->get_attribute('pa_wheel-colour'),
+                                'weight' => $product->get_weight(),
                                 'wheel_size' => $product->get_attribute('pa_wheel-size'),
                                 'wheel_width' => $product->get_attribute('pa_wheel-width'),
                                 'load_rating' => $product->get_attribute('pa_wheel-load-rating'),
                                 'offset' => $product->get_attribute('pa_wheel-offset'),
                                 'pcd' => $product->get_attribute('pa_wheel-pcd'),
+                                'sku' => $product->get_sku(),
+                                'ean' => $product->get_attribute('ean')
                             ]
                         ];
                     }
