@@ -154,7 +154,7 @@ class Fbf_Wheel_Search_Api
                             'stock' => $product->get_stock_quantity(),
                             'brand' => [
                                 'name' => $brand_term->name,
-                                'logo' => $brand_logo
+                                'logo' => $logo
                             ],
                             'details' => [
                                 'brand_name' => $product->get_attribute('pa_brand-name'),
