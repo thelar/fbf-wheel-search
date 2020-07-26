@@ -149,6 +149,7 @@ class Fbf_Wheel_Search_Api
                             'id' => $product_id,
                             'name' => get_the_title($product_id),
                             'price' => number_format(wc_get_price_including_tax($product), 2),
+                            'price_exc' => number_format(wc_get_price_excluding_tax($product), 2),
                             'currency' => get_woocommerce_currency_symbol(),
                             'image' => has_post_thumbnail($product_id)?wp_get_attachment_image_src(get_post_thumbnail_id($product_id), 'fbf-300-x')[0]:wc_placeholder_img_src('fbf-300-x'),
                             'stock' => $product->get_stock_quantity(),
