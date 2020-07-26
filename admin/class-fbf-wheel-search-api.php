@@ -377,6 +377,23 @@ class Fbf_Wheel_Search_Api
                     $price = number_format((wc_get_price_including_tax($product)), 2);
                     $button = sprintf('<a href="/?add-multiple-to-cart=%1$s:1" data-quantity="1" class="button product_type_simple add_multiple_to_cart_button ajax_add_to_cart" data-product_id="%1$s" data-product_sku="%2$s" data-chassis-id="%4$s" rel="nofollow">Add to basket</a>', $product->get_id(), $product->get_sku(), $max_packages, $chassis);
 
+                    //Category
+                    $category_term = get_term_by('id', $product->get_category_ids()[0], 'product_cat');
+                    $category = $category_term->name;
+
+                    //Brand logo
+                    $brand_logo = '';
+                    $brand_terms = get_the_terms($product->get_id(), 'pa_brand-name');
+
+                    foreach($brand_terms as $brand_term){ //In reality there's only ever going to be 1 brand per product
+                        $st = $brand_term->taxonomy . '_' . (string)$brand_term->term_id;
+                        if(!empty(get_field('brand_logo', $st))){
+                            $link = get_term_link($brand_term->term_id, 'pa_brand-name');
+                            $logo = get_field('brand_logo', $st)['sizes']['fbf-300-x'];
+                            $brand_logo = sprintf('<a href="%3$s"><img src="%1$s" alt="%2$s"/></a>', $logo, $brand_term->name, $link);
+                        }
+                    }
+
                     //Tax
                     $tax = '';
                     $rates = \WC_Tax::get_rates();
@@ -389,6 +406,7 @@ class Fbf_Wheel_Search_Api
                         'title' => $product->get_title(),
                         'url' => $product->get_permalink(),
                         'price' => $price,
+                        'price_exc' => number_format(wc_get_price_excluding_tax($product), 2),
                         'single_price' => $single_price,
                         'currency' => get_woocommerce_currency_symbol(),
                         'sku' => $product->get_sku(),
@@ -397,6 +415,17 @@ class Fbf_Wheel_Search_Api
                         'options' => $options,
                         'stock' => $product->get_stock_quantity(),
                         'tax' => $tax,
+                        'brand' => [
+                            'name' => $brand_term->name,
+                            'logo' => $logo
+                        ],
+                        'details' => [
+                            'brand_name' => $product->get_attribute('pa_brand-name'),
+                            'product_type' => $category,
+                            'weight' => $product->get_weight(),
+                            'sku' => $product->get_sku(),
+                            'ean' => $product->get_attribute('ean')
+                        ]
                     ];
                     $items[] = $item;
                 }
