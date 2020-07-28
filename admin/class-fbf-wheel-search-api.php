@@ -119,6 +119,7 @@ class Fbf_Wheel_Search_Api
         require_once plugin_dir_path(WP_PLUGIN_DIR . '/fbf-wheel-search/fbf-wheel-search.php') . 'includes/class-fbf-wheel-search-boughto-api.php';
         $api = new \Fbf_Wheel_Search_Boughto_Api('fbf_wheel_search', 'fbf-wheel-search');
         $wheel_data = $api->get_wheels($chassis_id);
+        $excluded_brands = get_field('excluded_wheel_brands', 'options')?:[];
 
         if(!is_wp_error($wheel_data)&&!array_key_exists('error', $wheel_data)) {
             $skus_ids = [];
@@ -141,37 +142,40 @@ class Fbf_Wheel_Search_Api
                             $link = get_term_link($brand_term->term_id, 'pa_brand-name');
                             $logo = get_field('brand_logo', $st)['sizes']['fbf-300-x'];
                             $brand_logo = sprintf('<a href="%3$s"><img src="%1$s" alt="%2$s"/></a>', $logo, $brand_term->name, $link);
+                            $brand_id = $brand_term->term_id;
                         }
                     }
                     if ($product->is_in_stock()) {
-                        $skus_ids[] = [
-                            //Add all the product data here
-                            'id' => $product_id,
-                            'name' => get_the_title($product_id),
-                            'price' => number_format(wc_get_price_including_tax($product), 2),
-                            'price_exc' => number_format(wc_get_price_excluding_tax($product), 2),
-                            'currency' => get_woocommerce_currency_symbol(),
-                            'image' => has_post_thumbnail($product_id)?wp_get_attachment_image_src(get_post_thumbnail_id($product_id), 'fbf-300-x')[0]:wc_placeholder_img_src('fbf-300-x'),
-                            'image_lg' => has_post_thumbnail($product->get_id())?wp_get_attachment_image_src(get_post_thumbnail_id($product->get_id()), 'fbf-1200-x')[0]:wc_placeholder_img_src('fbf-1200-x'),
-                            'stock' => $product->get_stock_quantity(),
-                            'brand' => [
-                                'name' => $brand_term->name,
-                                'logo' => $logo
-                            ],
-                            'details' => [
-                                'brand_name' => $product->get_attribute('pa_brand-name'),
-                                'product_type' => $category,
-                                'color' => $product->get_attribute('pa_wheel-colour'),
-                                'weight' => $product->get_weight(),
-                                'wheel_size' => $product->get_attribute('pa_wheel-size'),
-                                'wheel_width' => $product->get_attribute('pa_wheel-width'),
-                                'load_rating' => $product->get_attribute('pa_wheel-load-rating'),
-                                'offset' => $product->get_attribute('pa_wheel-offset'),
-                                'pcd' => $product->get_attribute('pa_wheel-pcd'),
-                                'sku' => $product->get_sku(),
-                                'ean' => $product->get_attribute('ean')
-                            ]
-                        ];
+                        if(!in_array($brand_id, $excluded_brands)){
+                            $skus_ids[] = [
+                                //Add all the product data here
+                                'id' => $product_id,
+                                'name' => get_the_title($product_id),
+                                'price' => number_format(wc_get_price_including_tax($product), 2),
+                                'price_exc' => number_format(wc_get_price_excluding_tax($product), 2),
+                                'currency' => get_woocommerce_currency_symbol(),
+                                'image' => has_post_thumbnail($product_id)?wp_get_attachment_image_src(get_post_thumbnail_id($product_id), 'fbf-300-x')[0]:wc_placeholder_img_src('fbf-300-x'),
+                                'image_lg' => has_post_thumbnail($product->get_id())?wp_get_attachment_image_src(get_post_thumbnail_id($product->get_id()), 'fbf-1200-x')[0]:wc_placeholder_img_src('fbf-1200-x'),
+                                'stock' => $product->get_stock_quantity(),
+                                'brand' => [
+                                    'name' => $brand_term->name,
+                                    'logo' => $logo
+                                ],
+                                'details' => [
+                                    'brand_name' => $product->get_attribute('pa_brand-name'),
+                                    'product_type' => $category,
+                                    'color' => $product->get_attribute('pa_wheel-colour'),
+                                    'weight' => $product->get_weight(),
+                                    'wheel_size' => $product->get_attribute('pa_wheel-size'),
+                                    'wheel_width' => $product->get_attribute('pa_wheel-width'),
+                                    'load_rating' => $product->get_attribute('pa_wheel-load-rating'),
+                                    'offset' => $product->get_attribute('pa_wheel-offset'),
+                                    'pcd' => $product->get_attribute('pa_wheel-pcd'),
+                                    'sku' => $product->get_sku(),
+                                    'ean' => $product->get_attribute('ean')
+                                ]
+                            ];
+                        }
                     }
                 }
             }
