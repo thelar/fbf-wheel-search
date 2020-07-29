@@ -172,7 +172,8 @@ class Fbf_Wheel_Search_Api
                                     'offset' => $product->get_attribute('pa_wheel-offset'),
                                     'pcd' => $product->get_attribute('pa_wheel-pcd'),
                                     'sku' => $product->get_sku(),
-                                    'ean' => $product->get_attribute('ean')
+                                    'ean' => $product->get_attribute('ean'),
+                                    'centre_bore' => $product->get_attribute('pa_centre-bore')
                                 ]
                             ];
                         }
