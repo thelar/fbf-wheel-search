@@ -138,11 +138,11 @@ class Fbf_Wheel_Search_Api
 
                     foreach($brand_terms as $brand_term){ //In reality there's only ever going to be 1 brand per product
                         $st = $brand_term->taxonomy . '_' . (string)$brand_term->term_id;
+                        $link = get_term_link($brand_term->term_id, 'pa_brand-name');
+                        $brand_id = $brand_term->term_id;
                         if(!empty(get_field('brand_logo', $st))){
-                            $link = get_term_link($brand_term->term_id, 'pa_brand-name');
                             $logo = get_field('brand_logo', $st)['sizes']['fbf-300-x'];
                             $brand_logo = sprintf('<a href="%3$s"><img src="%1$s" alt="%2$s"/></a>', $logo, $brand_term->name, $link);
-                            $brand_id = $brand_term->term_id;
                         }
                     }
                     if ($product->is_in_stock()) {
@@ -159,7 +159,7 @@ class Fbf_Wheel_Search_Api
                                 'stock' => $product->get_stock_quantity(),
                                 'brand' => [
                                     'name' => $brand_term->name,
-                                    'logo' => $logo
+                                    'logo' => isset($logo)?$logo:null,
                                 ],
                                 'details' => [
                                     'brand_name' => $product->get_attribute('pa_brand-name'),
