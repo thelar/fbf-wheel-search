@@ -119,7 +119,7 @@ class Fbf_Wheel_Search_Api
         require_once plugin_dir_path(WP_PLUGIN_DIR . '/fbf-wheel-search/fbf-wheel-search.php') . 'includes/class-fbf-wheel-search-boughto-api.php';
         $api = new \Fbf_Wheel_Search_Boughto_Api('fbf_wheel_search', 'fbf-wheel-search');
         $wheel_data = $api->get_wheels($chassis_id);
-        $excluded_brands = get_field('excluded_wheel_brands', 'options')?:[];
+        $included_brands = get_field('included_wheel_brands', 'options')?:[];
 
         if(!is_wp_error($wheel_data)&&!array_key_exists('error', $wheel_data)) {
             $skus_ids = [];
@@ -146,7 +146,7 @@ class Fbf_Wheel_Search_Api
                         }
                     }
                     if ($product->is_in_stock()) {
-                        if(!in_array($brand_id, $excluded_brands)){
+                        if(in_array($brand_id, $included_brands)){
                             $skus_ids[] = [
                                 //Add all the product data here
                                 'id' => $product_id,
