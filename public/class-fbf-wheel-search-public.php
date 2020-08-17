@@ -191,17 +191,13 @@ class Fbf_Wheel_Search_Public {
         if(!empty($data)){
             $i = 0;
             foreach($data as $chassis){
-                if(strpos(strtolower($chassis['name']), 'hidden')===false){
-                    $ds = DateTime::createFromFormat(DATE_ISO8601, $chassis['year_start']);
-                    $de = DateTime::createFromFormat(DATE_ISO8601, $chassis['year_end']);
-                    if($ds){
-                        $data[$i]['ds'] = $ds->format('Y');
-                    }
-                    if($de){
-                        $data[$i]['de'] = $de->format('Y');
-                    }
-                }else{
-                    unset($data[$i]);
+                $ds = DateTime::createFromFormat('Y-m-d', $chassis['generation']['start_date']);
+                $de = DateTime::createFromFormat('Y', $chassis['generation']['end_date']);
+                if($ds){
+                    $data[$i]['ds'] = $ds->format('Y');
+                }
+                if($de){
+                    $data[$i]['de'] = $de->format('Y');
                 }
                 $i++;
             }
@@ -209,7 +205,7 @@ class Fbf_Wheel_Search_Public {
 
         if(!empty($data)){
             usort($data, function($a, $b){
-                return [$a['name'], $b['ds']] <=> [$b['name'], $a['ds']];
+                return [$a['chassis']['display_name'], $b['ds']] <=> [$b['chassis']['display_name'], $a['ds']];
             });
         }
 

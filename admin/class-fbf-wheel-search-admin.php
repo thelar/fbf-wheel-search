@@ -154,8 +154,17 @@ class Fbf_Wheel_Search_Admin {
             $this->option_name . '_general',
             ['label_for' => $this->option_name . '_location_id']
         );
+        add_settings_field(
+            $this->option_name . '_bearer_token',
+            __( 'Bearer Token', 'fbf-wheel-search' ),
+            [$this, $this->option_name . '_bearer_token_cb'],
+            $this->plugin_name,
+            $this->option_name . '_general',
+            ['label_for' => $this->option_name . '_bearer_token']
+        );
         register_setting( $this->plugin_name, $this->option_name . '_api_key', [$this, 'fbf_wheel_search_validate_api_key'] );
         register_setting( $this->plugin_name, $this->option_name . '_location_id', [$this, 'fbf_wheel_search_validate_location_id'] );
+        register_setting( $this->plugin_name, $this->option_name . '_bearer_token', [$this, 'fbf_wheel_search_validate_bearer_token'] );
     }
 
     public function fbf_wheel_search_validate_api_key($input)
@@ -200,6 +209,27 @@ class Fbf_Wheel_Search_Admin {
         return $validated;
     }
 
+    public function fbf_wheel_search_validate_bearer_token($input)
+    {
+        $option = get_option($this->option_name . '_bearer_token');
+        $validated = sanitize_text_field($input);
+        if($validated !== $input){
+            $type = 'error';
+            $message = __('Bearer Token was not valid', 'fbf-wheel-search');
+            $validated = $option;
+        }else{
+            $type = 'updated';
+            $message = __('Bearer Token updated', 'fbf-wheel-search');
+        }
+        add_settings_error(
+            $this->option_name . '_location_id',
+            esc_attr('settings_updated'),
+            $message,
+            $type
+        );
+        return $validated;
+    }
+
     /**
      * Render the text for the general section
      *
@@ -227,6 +257,16 @@ class Fbf_Wheel_Search_Admin {
     public function fbf_wheel_search_location_id_cb() {
         $location_id = get_option( $this->option_name . '_location_id' );
         echo '<input type="text" name="' . $this->option_name . '_location_id' . '" id="' . $this->option_name . '_location_id' . '" value="' . $location_id . '"> ';
+    }
+
+    /**
+     * Render the flat fee input for this plugin
+     *
+     * @since  1.0.0
+     */
+    public function fbf_wheel_search_bearer_token_cb() {
+        $bearer_token = get_option( $this->option_name . '_bearer_token' );
+        echo '<input type="text" name="' . $this->option_name . '_bearer_token' . '" id="' . $this->option_name . '_bearer_token' . '" value="' . $bearer_token . '"> ';
     }
 
 

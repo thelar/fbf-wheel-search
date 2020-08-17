@@ -74,7 +74,10 @@
 					if(response.status==='success'){
 						let option = '<option value="">Select chassis</option>';
 						$.each(response.data, function(i, e){
-							let start_year;
+
+							console.log(e.chassis.display_name);
+
+							/*let start_year;
 							let end_year;
 							let start;
 							let end;
@@ -89,9 +92,9 @@
 								start_year = start.getFullYear();
 							}else{
 								start_year = '';
-							}
-							let id = e.id;
-							let text = e.name + ' ' + start_year + ' - ' + end_year;
+							}*/
+							let id = e.chassis.id;
+							let text = e.model.name + ' ' + e.generation.display_name;
 							let sel = '';
 							if(id==selected){
 								sel = ' selected';

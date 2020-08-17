@@ -5,9 +5,10 @@ class Fbf_Wheel_Search_Boughto_Api
 {
     private $option_name;
     private $plugin_name;
-    private $api_url = 'http://boughto.b8auto.com/api';
+    private $api_url = 'https://api.boughto.co.uk/api';
     private $location;
     private $api_key;
+    private $authorization;
     private $headers;
     public function __construct($option_name, $plugin_name)
     {
@@ -15,10 +16,10 @@ class Fbf_Wheel_Search_Boughto_Api
         $this->plugin_name = $plugin_name;
         $this->api_key = get_option($this->option_name . '_api_key');
         $this->location = get_option($this->option_name . '_location_id');
+        $this->authorization = get_option($this->option_name . '_bearer_token');
         $this->headers = [
             'headers' => [
-                "Accept" => "application/json",
-                "ApiKey" => $this->api_key,
+                "Authorization" => "Bearer " . $this->authorization
             ]
         ];
     }
@@ -28,11 +29,18 @@ class Fbf_Wheel_Search_Boughto_Api
         global $wpdb;
         $status = 'success';
         $table = $wpdb->prefix . 'fbf_vehicle_manufacturers';
-        $url = sprintf('%s/manufacturers', $this->api_url);
+        $url = sprintf('%s/vehicles/manufacturers', $this->api_url);
         $response = wp_remote_get($url, $this->headers);
         if (is_array($response)) {
             $data = json_decode(wp_remote_retrieve_body($response), true);
+
+            //Check response
+            if($data['status']==='success'){
+                $manufacturers = $data['manufacturers'];
+            }
         }
+
+
 
         //Retrieved boughto ids
         $boughto_ids = [];
@@ -47,8 +55,8 @@ class Fbf_Wheel_Search_Boughto_Api
             }
         }
 
-        foreach ($data as $key => $manufacturer) {
-            if (empty($manufacturer['display_name'])) {
+        foreach ($manufacturers as $key => $manufacturer) {
+            if (empty($manufacturer['name'])) {
                 unset ($data[$key]);
             }else{
                 $boughto_ids[] = $manufacturer['id'];
@@ -61,7 +69,7 @@ class Fbf_Wheel_Search_Boughto_Api
                         $table,
                         [
                             'name' => $manufacturer['name'],
-                            'display_name' => $manufacturer['display_name']
+                            'display_name' => $manufacturer['name']
                         ],
                         [
                             'boughto_id' => $manufacturer['id']
@@ -79,7 +87,7 @@ class Fbf_Wheel_Search_Boughto_Api
                         [
                             'boughto_id' => $manufacturer['id'],
                             'name' => $manufacturer['name'],
-                            'display_name' => $manufacturer['display_name'],
+                            'display_name' => $manufacturer['name'],
                         ]
                     );
                     if($insert!==1){
@@ -127,20 +135,27 @@ class Fbf_Wheel_Search_Boughto_Api
         if (!empty($transient)) {
             return $transient;
         } else {
-            $url = sprintf('%s/manufacturers/%d/chassis?location=%d', $this->api_url, (int)$manu_id, $this->location);
+            $url = sprintf('%s/vehicles/manufacturers/%d/chassis', $this->api_url, (int)$manu_id);
 
             $response = wp_remote_get($url, $this->headers);
 
             if(!is_wp_error($response)&&is_array($response)){
                 $data = json_decode(wp_remote_retrieve_body($response), true);
-                set_transient($key, $data, WEEK_IN_SECONDS);
 
-                //Set a transient that matches a chassis to manufacturer for recall in upsells
-                foreach($data as $chassis){
-                    $key = "boughto_chassis_{$chassis['id']}_manufacturer";
-                    set_transient($key, $manu_id, WEEK_IN_SECONDS);
+                if($data['status']==='success'){
+                    set_transient($key, $data['chassis'], WEEK_IN_SECONDS);
+
+                    //Set a transient that matches a chassis to manufacturer for recall in upsells
+                    foreach($data['chassis'] as $chassis){
+                        $key = "boughto_chassis_{$chassis['chassis']['id']}_manufacturer";
+                        set_transient($key, $manu_id, WEEK_IN_SECONDS);
+                    }
+                    return $data['chassis'];
+                }else{
+                    return false;
                 }
-                return $data;
+
+
             }else{
                 return $response;
             }
