@@ -94,7 +94,8 @@
 								start_year = '';
 							}*/
 							let id = e.chassis.id;
-							let text = e.model.name + ' ' + e.generation.display_name;
+							//let text = e.model.name + ' ' + e.generation.display_name;
+							let text = e.chassis.display_name;
 							let sel = '';
 							if(id==selected){
 								sel = ' selected';

@@ -345,4 +345,170 @@ class Fbf_Wheel_Search_Admin {
         return $html;
     }
 
+    public function fbf_wheel_search_scrape_boughto()
+    {
+        //Start by getting all manufacturers
+        global $wpdb;
+        $table = $wpdb->prefix . 'fbf_vehicle_manufacturers';
+        $sql = "SELECT * FROM $table WHERE enabled = 1";
+        $manufacturers = $wpdb->get_results($sql);
+
+        if($manufacturers!==false){
+            //We are going to attempt to get the chassis for each manufacturer in multi-threaded cURL
+            $ch = [];
+            $mh = curl_multi_init();
+            $urls = [];
+
+            foreach($manufacturers as $manufacturer){
+                $boughto_id = $manufacturer->boughto_id;
+                $ch_{$boughto_id} = curl_init();
+
+                $urls[] = "https://api.boughto.co.uk/api/vehicles/manufacturers/" . $boughto_id . "/chassis";
+                $extraOptions = [
+                    CURLOPT_ENCODING => "",
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 0,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => "GET",
+                    CURLOPT_HTTPHEADER => [
+                        "Accept: application/json",
+                        "Authorization: Bearer a5785ee35b10c0a179a40ed5567f367235cd28ffb115460b3821bdbcec677d9b"
+                    ]
+                ];
+
+
+                /*
+
+                curl_setopt_array($ch_{$boughto_id}, [
+                    CURLOPT_URL => "https://api.boughto.co.uk/api/vehicles/manufacturers/" . $boughto_id . "/chassis",
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => "",
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 0,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => "GET",
+                    CURLOPT_HTTPHEADER => [
+                        "Accept: application/json",
+                        "Authorization: Bearer a5785ee35b10c0a179a40ed5567f367235cd28ffb115460b3821bdbcec677d9b"
+                    ]
+                ]);
+                curl_multi_add_handle($mh, $ch_{$boughto_id});
+                $ch[] = $ch_{$boughto_id};*/
+            }
+
+            $chassis = $this->paraCurl($urls, 10, $extraOptions);
+            $chassis_ids = [];
+            $chassis_urls = [];
+            foreach($chassis as $chas){
+                if($chas['info']['http_code']===200 && isset($chas['body'])){
+                    $manu_chassis = json_decode($chas['body']);
+                    if($manu_chassis->status==='success'){
+                        foreach($manu_chassis->chassis as $manu_chas){
+                            $chassis_ids[] = [
+                                'id' => $manu_chas->chassis->id,
+                                'display_name' => $manu_chas->chassis->display_name
+                            ];
+                            $chassis_urls[] = 'https://api.boughto.co.uk/api/search/wheels?chassis_id=' . $manu_chas->chassis->id;
+                        }
+                    }
+                }
+            }
+
+            ini_set('xdebug.var_display_max_depth', '10');
+            ini_set('xdebug.var_display_max_children', '5000');
+            ini_set('xdebug.var_display_max_data', '1024');
+
+            var_dump($chassis_urls);
+
+            /*$init_wheels = $this->paraCurl($chassis_urls, 10, $extraOptions);
+            foreach($init_wheels as $init_wheel){
+                if(isset($init_wheel['body'])){
+                    $wheel = json_decode($init_wheel['body']);
+                    var_dump($wheel->status);
+                }
+            }*/
+
+
+            /*$running = null;
+            do {
+                curl_multi_exec($mh, $running);
+            } while ($running);
+
+            foreach($ch as $resource){
+                curl_multi_remove_handle($mh, $resource);
+                var_dump(curl_multi_getcontent($resource));
+            }
+            curl_multi_close($mh);*/
+        }
+        die();
+    }
+
+    /**
+     * Process any number of cURL requests in parallel, but limit
+     * the number of simultaneous requests to $parallel.
+     *
+     * @param array $urls          Array with URLs to process
+     * @param int   $parallel      Number of concurrent requests
+     * @param array $extraOptions  User defined CURLOPTS
+     * @return array[]
+     */
+    private function paraCurl($urls = [], $parallel = 10, $extraOptions = []) {
+
+        // $extraOptions override the hardcoded ones.
+        $options = $extraOptions + [
+                CURLOPT_RETURNTRANSFER => 1,
+                CURLOPT_FOLLOWLOCATION => 1,
+                CURLOPT_CONNECTTIMEOUT => 3,
+                CURLOPT_SSL_VERIFYHOST => 0,
+                CURLOPT_SSL_VERIFYPEER => 0,
+                CURLOPT_HEADER         => 1
+            ];
+
+        // The curl_multi handle.
+        $mh = curl_multi_init();
+
+        // Array with curl handles.
+        $chs = [];
+
+        // Create the individual curl handles and set options.
+        foreach ($urls as $key => $url) {
+            $chs[$key] = curl_init($url);
+            curl_setopt_array($chs[$key], $options);
+        }
+
+        $curls = $chs;
+        $open = null;
+
+        // Perform the requests requests & dynamically (re)fill available slots
+        // up to the specified limit ($parallel) until all urls are processed.
+        while (0 < $open || 0 < count($curls)) {
+            if ($open < $parallel && 0 < count($curls)) {
+                curl_multi_add_handle($mh, array_shift($curls));
+            }
+
+            curl_multi_exec($mh, $open);
+            usleep(11111);
+        }
+
+        // Extract downloaded data from curl handle.
+        foreach ($chs as $key => $ch) {
+            $res[$key]['info'] = curl_getinfo($ch);
+            $response = curl_multi_getcontent($ch);
+
+            // Separate response header & body.
+            $res[$key]['head'] = substr($response, 0, $res[$key]['info']['header_size']);
+            $res[$key]['body'] = substr($response, $res[$key]['info']['header_size']);
+
+            curl_multi_remove_handle($mh, $ch);
+        }
+
+        // Close the curl_multi handle.
+        curl_multi_close($mh);
+
+        // Finally return all results.
+        return isset($res) ? $res : [];
+    }
+
 }

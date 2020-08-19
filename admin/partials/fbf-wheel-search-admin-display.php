@@ -36,6 +36,11 @@
         <input type="submit" value="Sync Manufacturers" class="button-primary">
     </form>
 
+    <form action="<?php echo admin_url('admin-post.php'); ?>" method="post" style="margin-bottom: 1em">
+        <input type="hidden" name="action" value="fbf_wheel_search_scrape_boughto">
+        <input type="submit" value="Scrape Boughto" class="button-primary">
+    </form>
+
     <hr/>
 
     <h2>Manufacturers</h2>
