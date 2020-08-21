@@ -184,6 +184,27 @@ class Fbf_Wheel_Search_Boughto_Api
         }
     }
 
+    public function get_wheels_v4($chasis_id)
+    {
+        $key = "boughto_v4_wheels_for_chasis_{$chasis_id}";
+        $transient = get_transient($key);
+
+        if(!empty($transient)){
+            return $transient;
+        }else{
+            $url = sprintf('%s/search/wheels?chassis_id=%d&itemsPerPage=500', $this->api_url, $chasis_id);
+            $response = wp_remote_get($url, $this->headers);
+
+            if(!is_wp_error($response)&&is_array($response)){
+                $data = json_decode(wp_remote_retrieve_body($response), true);
+                set_transient($key, $data, WEEK_IN_SECONDS);
+                return $data;
+            }else{
+                return $response;
+            }
+        }
+    }
+
     public function tyres_for_wheels($product_id, $chassis, $width, $diameter, $offset)
     {
         $key = "boughto_tyre_for_wheel_{$product_id}_{$chassis}";
