@@ -250,6 +250,34 @@ class Fbf_Wheel_Search_Admin {
         die('fbf_wheel_search_sync_manufacturers');
     }
 
+    public function fbf_api_capture_data()
+    {
+        //Start by getting urls for chassis api calls
+        global $wpdb;
+        $table = $wpdb->prefix . 'fbf_vehicle_manufacturers';
+        $sql = "SELECT * FROM $table WHERE enabled = 1";
+        $manufacturers = $wpdb->get_results($sql);
+
+        $manu_api_calls = [];
+
+        if($manufacturers!==false){
+            foreach($manufacturers as $manufacturer){
+                //$html.= sprintf('<option value="%s">%s</option>', $manufacturer->boughto_id, $manufacturer->display_name);
+
+                $manu_api_calls[] = [
+                    'key' => "boughto_bu_manufacturer_{$manufacturer->boughto_id}_chassis",
+                    'url' => sprintf('%s/manufacturers/%d/chassis?location=%d', 'http://boughto.b8auto.com/api', (int)$manufacturer->boughto_id, '7')
+                ];
+
+
+            }
+
+            var_dump($manu_api_calls);
+        }
+
+        die('fbf_api_capture_data');
+    }
+
     public function fbf_wheel_search_enable_manufacturer()
     {
         $action = filter_var($_POST['toggle'], FILTER_SANITIZE_STRING);

@@ -162,6 +162,7 @@ class Fbf_Wheel_Search {
         $this->loader->add_action( 'admin_init', $plugin_admin, 'register_settings' );
         $this->loader->add_action( 'admin_menu', $plugin_admin, 'add_menu_page' );
         $this->loader->add_action( 'admin_post_fbf_wheel_search_sync_manufacturers', $plugin_admin, 'fbf_wheel_search_sync_manufacturers');
+        $this->loader->add_action( 'admin_post_fbf_api_capture_data', $plugin_admin, 'fbf_api_capture_data');
         $this->loader->add_action( 'admin_post_fbf_wheel_search_enable_manufacturer', $plugin_admin, 'fbf_wheel_search_enable_manufacturer');
         $this->loader->add_action( 'admin_notices', $plugin_admin, 'fbf_wheel_search_admin_notices');
 

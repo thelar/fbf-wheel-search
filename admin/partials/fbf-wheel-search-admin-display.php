@@ -36,6 +36,11 @@
         <input type="submit" value="Sync Manufacturers" class="button-primary">
     </form>
 
+    <form action="<?php echo admin_url('admin-post.php'); ?>" method="post" style="margin-bottom: 1em">
+        <input type="hidden" name="action" value="fbf_api_capture_data">
+        <input type="submit" value="Capture V3 Data" class="button-primary">
+    </form>
+
     <hr/>
 
     <h2>Manufacturers</h2>
