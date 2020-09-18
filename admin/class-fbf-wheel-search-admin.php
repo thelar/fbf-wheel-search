@@ -252,27 +252,114 @@ class Fbf_Wheel_Search_Admin {
 
     public function fbf_api_capture_data()
     {
+        ini_set('xdebug.var_display_max_depth', '10');
+        ini_set('xdebug.var_display_max_children', '5000');
+        ini_set('xdebug.var_display_max_data', '1024');
+
         //Start by getting urls for chassis api calls
         global $wpdb;
         $table = $wpdb->prefix . 'fbf_vehicle_manufacturers';
         $sql = "SELECT * FROM $table WHERE enabled = 1";
         $manufacturers = $wpdb->get_results($sql);
 
+        $api_key = get_option('fbf_wheel_search' . '_api_key');
+        $location = get_option('fbf_wheel_search' . '_location_id');
+
         $manu_api_calls = [];
 
         if($manufacturers!==false){
             foreach($manufacturers as $manufacturer){
                 //$html.= sprintf('<option value="%s">%s</option>', $manufacturer->boughto_id, $manufacturer->display_name);
-
                 $manu_api_calls[] = [
+                    'id' => $manufacturer->boughto_id,
                     'key' => "boughto_bu_manufacturer_{$manufacturer->boughto_id}_chassis",
-                    'url' => sprintf('%s/manufacturers/%d/chassis?location=%d', 'http://boughto.b8auto.com/api', (int)$manufacturer->boughto_id, '7')
+                    'url' => sprintf('%s/manufacturers/%d/chassis?location=%d', 'http://boughto.b8auto.com/api', (int)$manufacturer->boughto_id, $location)
                 ];
-
-
             }
 
-            var_dump($manu_api_calls);
+            //var_dump($manu_api_calls);
+
+            $extraOptions = [
+                CURLOPT_ENCODING => "",
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => "GET",
+                CURLOPT_HTTPHEADER => [
+                    "Accept: application/json",
+                    "ApiKey: " . $api_key,
+                ]
+            ];
+
+            //var_dump(array_column($manu_api_calls, 'url'));
+
+            $manus = $this->paraCurl(array_column($manu_api_calls, 'url'), 10, $extraOptions);
+
+            $chassis_api_calls = [];
+            foreach($manus as $manu){
+                if($manu['info']['http_code']===200){
+                    $key = $manu_api_calls[array_search($manu['info']['url'], array_column($manu_api_calls, 'url'))]['key'];
+                    $manu_id = $manu_api_calls[array_search($manu['info']['url'], array_column($manu_api_calls, 'url'))]['id'];
+                    $url = $manu['info']['url'];
+                    $data = json_decode($manu['body']);
+
+                    set_transient($key, $data, YEAR_IN_SECONDS);
+
+                    /*
+                    var_dump($url);
+                    var_dump($key);
+                    var_dump($data);
+                    */
+
+                    foreach($data as $chassis){
+                        $id = $chassis->id;
+                        $key = "boughto_bu_chassis_{$id}_manufacturer";
+                        set_transient($key, $manu_id, YEAR_IN_SECONDS);
+
+                        $chassis_api_calls[] = [
+                            'id' => $id,
+                            'key' => "boughto_bu_wheels_for_chasis_{$id}",
+                            'url' => sprintf('%s/search/wheels?location=%d&chassis=%d&returnStaggered=1&matchCentreBore=1&matchLoadRating=1&diameter=0&offset=0&limit=1000', 'http://boughto.b8auto.com/api', $location, $id)
+                        ];
+                    }
+                }
+            }
+
+            //var_dump($chassis_api_calls);
+
+            $chassis = $this->paraCurl(array_column($chassis_api_calls, 'url'), 10, $extraOptions);
+
+            $sku_calls = [];
+            foreach($chassis as $chas){
+                var_dump($chas['info']['url'] . ' - ' . $chas['info']['http_code']);
+                if($chas['info']['http_code']===200){
+                    $key = $chassis_api_calls[array_search($manu['info']['url'], array_column($chassis_api_calls, 'url'))]['key'];
+                    $chas_id = $chassis_api_calls[array_search($manu['info']['url'], array_column($chassis_api_calls, 'url'))]['id'];
+                    $data = json_decode($chas['body']);
+                    set_transient($key, $data, YEAR_IN_SECONDS);
+
+                    //var_dump($data);
+
+                    foreach($data->data as $wheel) {
+                        $product_id = wc_get_product_id_by_sku($wheel->ean);
+                        if ($product_id) {
+                            $wheel_width_terms = wc_get_product_terms($product_id, 'pa_wheel-width');
+                            $wheel_diameter_terms = wc_get_product_terms($product_id, 'pa_wheel-size');
+                            $wheel_offset_terms = wc_get_product_terms($product_id, 'pa_wheel-offset');
+
+                            $key = "boughto_bu_tyre_for_wheel_{$product_id}_{$chas_id}";
+
+                            $sku_calls[] = [
+                                'key' => $key,
+                                'url' => sprintf("%s/search/tyres-for-wheel/%s/%s/%s?location=%d&upstep=both&wheel_offset=%d", 'http://boughto.b8auto.com/api', (int)$chas_id, (float)$wheel_width_terms[0]->name, (int)$wheel_diameter_terms[0]->name, $location, $wheel_offset_terms[0]->name)
+                            ];
+                        }
+                    }
+                }
+            }
+
+            var_dump($sku_calls);
         }
 
         die('fbf_api_capture_data');
@@ -331,6 +418,72 @@ class Fbf_Wheel_Search_Admin {
             }
         }
         return $html;
+    }
+
+    /**
+     * Process any number of cURL requests in parallel, but limit
+     * the number of simultaneous requests to $parallel.
+     *
+     * @param array $urls          Array with URLs to process
+     * @param int   $parallel      Number of concurrent requests
+     * @param array $extraOptions  User defined CURLOPTS
+     * @return array[]
+     */
+    private function paraCurl($urls = [], $parallel = 10, $extraOptions = []) {
+
+        // $extraOptions override the hardcoded ones.
+        $options = $extraOptions + [
+                CURLOPT_RETURNTRANSFER => 1,
+                CURLOPT_FOLLOWLOCATION => 1,
+                CURLOPT_CONNECTTIMEOUT => 3,
+                CURLOPT_SSL_VERIFYHOST => 0,
+                CURLOPT_SSL_VERIFYPEER => 0,
+                CURLOPT_HEADER         => 1
+            ];
+
+        // The curl_multi handle.
+        $mh = curl_multi_init();
+
+        // Array with curl handles.
+        $chs = [];
+
+        // Create the individual curl handles and set options.
+        foreach ($urls as $key => $url) {
+            $chs[$key] = curl_init($url);
+            curl_setopt_array($chs[$key], $options);
+        }
+
+        $curls = $chs;
+        $open = null;
+
+        // Perform the requests requests & dynamically (re)fill available slots
+        // up to the specified limit ($parallel) until all urls are processed.
+        while (0 < $open || 0 < count($curls)) {
+            if ($open < $parallel && 0 < count($curls)) {
+                curl_multi_add_handle($mh, array_shift($curls));
+            }
+
+            curl_multi_exec($mh, $open);
+            usleep(11111);
+        }
+
+        // Extract downloaded data from curl handle.
+        foreach ($chs as $key => $ch) {
+            $res[$key]['info'] = curl_getinfo($ch);
+            $response = curl_multi_getcontent($ch);
+
+            // Separate response header & body.
+            $res[$key]['head'] = substr($response, 0, $res[$key]['info']['header_size']);
+            $res[$key]['body'] = substr($response, $res[$key]['info']['header_size']);
+
+            curl_multi_remove_handle($mh, $ch);
+        }
+
+        // Close the curl_multi handle.
+        curl_multi_close($mh);
+
+        // Finally return all results.
+        return isset($res) ? $res : [];
     }
 
 }
