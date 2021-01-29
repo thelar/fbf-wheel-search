@@ -39,7 +39,7 @@ class Fbf_Wheel_Search_Api
         }
 
         if($wp->request == 'api/v2/pb_get_wheels'){
-            $this->get_wheels();
+            $this->get_wheels(11.1);
             exit;
         }
 
@@ -49,7 +49,7 @@ class Fbf_Wheel_Search_Api
         }
 
         if($wp->request == 'api/v2/pb_get_accessories'){
-            $this->get_accessories();
+            $this->get_accessories(11.1);
             exit;
         }
     }
@@ -113,7 +113,7 @@ class Fbf_Wheel_Search_Api
         $this->render_json($data);
     }
 
-    private function get_wheels()
+    private function get_wheels($pc=0)
     {
         $chassis_id = filter_var($_REQUEST['id'], FILTER_SANITIZE_STRING);
         require_once plugin_dir_path(WP_PLUGIN_DIR . '/fbf-wheel-search/fbf-wheel-search.php') . 'includes/class-fbf-wheel-search-boughto-api.php';
@@ -145,14 +145,23 @@ class Fbf_Wheel_Search_Api
                             $brand_logo = sprintf('<a href="%3$s"><img src="%1$s" alt="%2$s"/></a>', $logo, $brand_term->name, $link);
                         }
                     }
+                    $price = number_format(wc_get_price_including_tax($product), 2);
+                    $price_exc = number_format(wc_get_price_excluding_tax($product), 2);
+                    if($pc > 0){
+                        $price+= ($price/100) * $pc;
+                        $price_exc+= ($price_exc/100) * $pc;
+                        $price = number_format($price, 2);
+                        $price_exc = number_format($price_exc, 2);
+                    }
+
                     if ($product->is_in_stock()) {
                         if(in_array($brand_id, $included_brands)){
                             $skus_ids[] = [
                                 //Add all the product data here
                                 'id' => $product_id,
                                 'name' => get_the_title($product_id),
-                                'price' => number_format(wc_get_price_including_tax($product), 2),
-                                'price_exc' => number_format(wc_get_price_excluding_tax($product), 2),
+                                'price' => $price,
+                                'price_exc' => $price_exc,
                                 'currency' => get_woocommerce_currency_symbol(),
                                 'image' => has_post_thumbnail($product_id)?wp_get_attachment_image_src(get_post_thumbnail_id($product_id), 'fbf-300-x')[0]:wc_placeholder_img_src('fbf-300-x'),
                                 'image_lg' => has_post_thumbnail($product->get_id())?wp_get_attachment_image_src(get_post_thumbnail_id($product->get_id()), 'fbf-1200-x')[0]:wc_placeholder_img_src('fbf-1200-x'),
@@ -207,7 +216,7 @@ class Fbf_Wheel_Search_Api
         $this->render_json($data);
     }
 
-    private function get_accessories()
+    private function get_accessories($pc=null)
     {
         global $wp_query;
         $response = [];
@@ -270,7 +279,7 @@ class Fbf_Wheel_Search_Api
                             'sku' => $sku
                         ],
                     ];
-                    if($items = $this->get_upsell_items($chassis, $sku, 1)){
+                    if($items = $this->get_upsell_items($chassis, $sku, 1, $pc)){
                         $nuts['items'] = $items;
                     }
                     $response[] = $nuts;
@@ -287,7 +296,7 @@ class Fbf_Wheel_Search_Api
                             'sku' => $sku,
                         ]
                     ];
-                    if($items = $this->get_upsell_items($chassis, $sku, 1)){
+                    if($items = $this->get_upsell_items($chassis, $sku, 1, $pc)){
                         $caps['items'] = $items;
                     }
                     $response[] = $caps;
@@ -308,7 +317,7 @@ class Fbf_Wheel_Search_Api
                         'title' => get_the_title($upsell->ID),
                     ];
                 }
-                if($items = $this->get_upsell_items($chassis, false, 1, $generic_upsell_ids)){
+                if($items = $this->get_upsell_items($chassis, false, 1, $pc, $generic_upsell_ids)){
                     $generic['items'] = $items;
                 }
                 $response[] = $generic;
@@ -326,7 +335,7 @@ class Fbf_Wheel_Search_Api
         ]);
     }
 
-    private function get_upsell_items($chassis, $sku, $qty,  $ids=false)
+    private function get_upsell_items($chassis, $sku, $qty, $pc=null, $ids=false)
     {
         //Pull out the matching products
         if($sku!==false){
@@ -381,6 +390,13 @@ class Fbf_Wheel_Search_Api
                     }
                     $single_price = wc_get_price_including_tax($product);
                     $price = number_format((wc_get_price_including_tax($product)), 2);
+                    $price_exc = number_format(wc_get_price_excluding_tax($product), 2);
+                    if(!is_null($pc)&&$pc>0){
+                        $price+= ($price/100) * $pc;
+                        $price_exc+= ($price_exc/100) * $pc;
+                        $price = number_format($price, 2);
+                        $price_exc = number_format($price_exc, 2);
+                    }
                     $button = sprintf('<a href="/?add-multiple-to-cart=%1$s:1" data-quantity="1" class="button product_type_simple add_multiple_to_cart_button ajax_add_to_cart" data-product_id="%1$s" data-product_sku="%2$s" data-chassis-id="%4$s" rel="nofollow">Add to basket</a>', $product->get_id(), $product->get_sku(), $max_packages, $chassis);
 
                     //Category
@@ -412,7 +428,7 @@ class Fbf_Wheel_Search_Api
                         'title' => $product->get_title(),
                         'url' => $product->get_permalink(),
                         'price' => $price,
-                        'price_exc' => number_format(wc_get_price_excluding_tax($product), 2),
+                        'price_exc' => $price_exc,
                         'single_price' => $single_price,
                         'currency' => get_woocommerce_currency_symbol(),
                         'sku' => $product->get_sku(),
