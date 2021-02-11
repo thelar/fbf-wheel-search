@@ -303,7 +303,7 @@ class Fbf_Wheel_Search_Api
                 }
             }
 
-            //Generic upsells
+            /*//Generic upsells
             $generic_upsells = get_field('upsells', 'options');
             $generic_upsell_ids = [];
             if($generic_upsells){
@@ -321,7 +321,7 @@ class Fbf_Wheel_Search_Api
                     $generic['items'] = $items;
                 }
                 $response[] = $generic;
-            }
+            }*/
         }
 
 
