@@ -315,7 +315,7 @@ class Fbf_Wheel_Search_Api
                     $generic['item'][] = [
                         'id' => $upsell->ID,
                         'title' => get_the_title($upsell->ID),
-                    ];
+                    ];x
                 }
                 if($items = $this->get_upsell_items($chassis, false, 1, $pc, $generic_upsell_ids)){
                     $generic['items'] = $items;
