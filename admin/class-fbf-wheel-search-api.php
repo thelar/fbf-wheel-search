@@ -154,6 +154,15 @@ class Fbf_Wheel_Search_Api
                         $price_exc = number_format($price_exc, 2);
                     }
 
+                    $stock_msg = '';
+                    if($product->get_stock_quantity()<=0){
+                        if($product->get_meta('_expected_back_in_stock_date', true)){
+                            $back_in_stock = new \DateTime($product->get_meta('_expected_back_in_stock_date', true));
+                            $back_in_stock->modify('+7 day');
+                            $stock_msg = '</br>' . sprintf('(Due back in stock %s)', $back_in_stock->format('jS F'));
+                        }
+                    }
+
                     if ($product->is_in_stock()) {
                         if(in_array($brand_id, $included_brands)){
                             $skus_ids[] = [
@@ -166,6 +175,7 @@ class Fbf_Wheel_Search_Api
                                 'image' => has_post_thumbnail($product_id)?wp_get_attachment_image_src(get_post_thumbnail_id($product_id), 'fbf-300-x')[0]:wc_placeholder_img_src('fbf-300-x'),
                                 'image_lg' => has_post_thumbnail($product->get_id())?wp_get_attachment_image_src(get_post_thumbnail_id($product->get_id()), 'fbf-1200-x')[0]:wc_placeholder_img_src('fbf-1200-x'),
                                 'stock' => $product->get_stock_quantity(),
+                                'stock_msg' => $stock_msg,
                                 'brand' => [
                                     'name' => $brand_term->name,
                                     'logo' => isset($logo)?$logo:null,
