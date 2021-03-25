@@ -30,7 +30,6 @@
 	 */
 
 	$(function() {
-		console.log('here');
 		let $manufacturer_select = $('#fbf-wheel-search-manufacturer-select, #fbf-package-search-manufacturer-select');
 		$manufacturer_select.val($manufacturer_select.find('option:first').val());
 		let $chasis_select;
