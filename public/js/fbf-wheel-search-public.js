@@ -53,12 +53,8 @@
 		});
 
 		window.populate_chasis = function ($chasis_select, manufacturer_id, is_packages_page, selected){
-			console.log('manufacturer change');
-			console.log('Value: ' + manufacturer_id);
-
 			$chasis_select.empty();
 			$chasis_select.append('<option>Please wait...</option>');
-
 			let data = {
 				action: 'fbf_wheel_search_get_chasis',
 				manufacturer_id: manufacturer_id,
