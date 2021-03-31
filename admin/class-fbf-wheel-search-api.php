@@ -165,7 +165,7 @@ class Fbf_Wheel_Search_Api
                         if($product->get_meta('_expected_back_in_stock_date', true)){
                             $back_in_stock = new \DateTime($product->get_meta('_expected_back_in_stock_date', true));
                             $back_in_stock->modify('+7 day');
-                            $stock_msg.= '</br>' . sprintf('(More expected %s)', $back_in_stock->format('jS F'));
+                            $stock_msg.= sprintf('(More expected %s)', $back_in_stock->format('jS F'));
                         }
                     }
 
