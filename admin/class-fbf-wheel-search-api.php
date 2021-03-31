@@ -161,6 +161,12 @@ class Fbf_Wheel_Search_Api
                             $back_in_stock->modify('+7 day');
                             $stock_msg = sprintf('(Due back in stock %s)', $back_in_stock->format('jS F'));
                         }
+                    }else if($product->get_stock_quantity()<=10){
+                        if($product->get_meta('_expected_back_in_stock_date', true)){
+                            $back_in_stock = new \DateTime($product->get_meta('_expected_back_in_stock_date', true));
+                            $back_in_stock->modify('+7 day');
+                            $stock_msg.= '</br>' . sprintf('(More expected %s)', $back_in_stock->format('jS F'));
+                        }
                     }
 
                     if ($product->is_in_stock()) {
