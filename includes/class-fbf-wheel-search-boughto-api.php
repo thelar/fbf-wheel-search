@@ -176,7 +176,7 @@ class Fbf_Wheel_Search_Boughto_Api
 
             if(!is_wp_error($response)&&is_array($response)){
                 $data = json_decode(wp_remote_retrieve_body($response), true);
-                //set_transient($key, $data, HOUR_IN_SECONDS);
+                //set_transient($key, $data, HOUR_IN_SECONDS); TODO: put back when testing is finished
                 return $data;
             }else{
                 return $response;
@@ -207,26 +207,41 @@ class Fbf_Wheel_Search_Boughto_Api
 
     public function tyres_for_wheels($product_id, $chassis, $width, $diameter, $offset)
     {
-        $key = "boughto_tyre_for_wheel_{$product_id}_{$chassis}";
-        $transient = get_transient($key);
-
-        if(!empty($transient)){
-            $data = $transient;
-        }else{
-            // Tyres
-            $url = sprintf("%s/search/tyres-for-wheel/%s/%s/%s?location=%d&upstep=both&wheel_offset=%d", $this->api_url, (int)$chassis,
-                (float)$width, (int)$diameter, $this->location, $offset);
-
-            $response = wp_remote_get($url, $this->headers);
-
-            $tyre_sizes = array();
-            if (is_array($response)) {
-                $data = json_decode(wp_remote_retrieve_body($response), true);
-                $data['url'] = $url;
-                set_transient($key, $data, DAY_IN_SECONDS);
-            }
+        $wheels_data_key = "boughto_wheels_for_chasis_{$chassis}";
+        if(!$wheels_data = get_transient($wheels_data_key)){
+            $wheels_data = $this->get_wheels($chassis)['results'];
         }
-        return $data;
+        if(is_array($wheels_data) && !empty($wheels_data)){
+            $product = wc_get_product($product_id);
+            $sku = $product->get_sku();
+            $wheel_id = $wheels_data[array_search($sku, array_column($wheels_data, 'product_code'))]['id'];
+        }
+
+        if($wheel_id){
+            $key = "boughto_tyre_for_wheel_{$wheel_id}_{$chassis}";
+            $transient = get_transient($key);
+
+            if(!empty($transient)){
+                $data = $transient;
+            }else{
+                // Tyres
+                //$url = sprintf("%s/search/tyres-for-wheel/%s/%s/%s?location=%d&upstep=both&wheel_offset=%d", $this->api_url, (int)$chassis, (float)$width, (int)$diameter, $this->location, $offset);
+
+                $url = sprintf("%s/search/wheels/%d/tyres?wheel_id=%d&ignore_no_stock=1&ignore_no_price=1", $this->api_url, (int)$chassis, (int)$wheel_id);
+
+                $response = wp_remote_get($url, $this->headers);
+
+                $tyre_sizes = array();
+                if (is_array($response)) {
+                    $data = json_decode(wp_remote_retrieve_body($response), true);
+                    $data['url'] = $url;
+                    set_transient($key, $data, DAY_IN_SECONDS);
+                }
+            }
+            return $data;
+        }else{
+            return false;
+        }
     }
 
     /**
