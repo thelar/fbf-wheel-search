@@ -170,7 +170,7 @@ class Fbf_Wheel_Search_Boughto_Api
         if(!empty($transient)){
             return $transient;
         }else{
-            $url = sprintf('%s/search/wheels?location=%d&chassis=%d&returnStaggered=1&matchCentreBore=1&matchLoadRating=1&diameter=0&offset=0&limit=1000', $this->api_url, $this->location, $chasis_id);
+            $url = sprintf('%s/search/wheels?chassis_id=%d&ignore_no_price=1&ignore_no_stock=1', $this->api_url, $chasis_id);
 
             $response = wp_remote_get($url, $this->headers);
 
