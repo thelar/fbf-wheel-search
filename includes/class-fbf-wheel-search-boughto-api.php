@@ -228,4 +228,24 @@ class Fbf_Wheel_Search_Boughto_Api
         }
         return $data;
     }
+
+    /**
+     * Check whether a given product_id (wheel) fits a chassis
+     *
+     * @param $product_id
+     * @param $chassis_id
+     * @return bool
+     */
+    public function wheel_fits_chassis($product_id, $chassis_id)
+    {
+        $wheels = $this->get_wheels($chassis_id);
+        if(!empty($wheels['data'])){
+            $sku = wc_get_product($product_id)->get_sku();
+            $search = array_search($sku, array_column($wheels['data'], 'ean'));
+            if($search!==false){
+                return true;
+            }
+        }
+        return false;
+    }
 }

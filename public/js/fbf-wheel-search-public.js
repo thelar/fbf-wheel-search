@@ -30,7 +30,6 @@
 	 */
 
 	$(function() {
-		console.log('here');
 		let $manufacturer_select = $('#fbf-wheel-search-manufacturer-select, #fbf-package-search-manufacturer-select');
 		$manufacturer_select.val($manufacturer_select.find('option:first').val());
 		let $chasis_select;
@@ -54,12 +53,8 @@
 		});
 
 		window.populate_chasis = function ($chasis_select, manufacturer_id, is_packages_page, selected){
-			console.log('manufacturer change');
-			console.log('Value: ' + manufacturer_id);
-
 			$chasis_select.empty();
 			$chasis_select.append('<option>Please wait...</option>');
-
 			let data = {
 				action: 'fbf_wheel_search_get_chasis',
 				manufacturer_id: manufacturer_id,
@@ -117,7 +112,7 @@
 					if($(this).attr('id')==='fbf-wheel-search-chasis-select'){
 						$manu = $('#fbf-wheel-search-manufacturer-select');
 						//console.log($manufacturer_select.val());
-						let url = '/wheel-search/chassis/' + $(this).val() + '/vehicle/' + encodeURIComponent($manu.find(':selected').text() + ' ' + $chasis_select.find(':selected').text()) + '/';
+						let url = '/wheel-search-results/chassis/' + $(this).val() + '/vehicle/' + encodeURIComponent($manu.find(':selected').text() + ' ' + $chasis_select.find(':selected').text()) + '/';
 						//console.log(url);
 						window.location.href = url;
 					}else if($(this).attr('id')==='fbf-package-search-chasis-select'){
