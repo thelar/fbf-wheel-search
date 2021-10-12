@@ -176,7 +176,7 @@ class Fbf_Wheel_Search_Boughto_Api
 
             if(!is_wp_error($response)&&is_array($response)){
                 $data = json_decode(wp_remote_retrieve_body($response), true);
-                set_transient($key, $data, HOUR_IN_SECONDS);
+                //set_transient($key, $data, HOUR_IN_SECONDS);
                 return $data;
             }else{
                 return $response;
