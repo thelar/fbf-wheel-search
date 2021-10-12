@@ -5,7 +5,7 @@ class Fbf_Wheel_Search_Boughto_Api
 {
     private $option_name;
     private $plugin_name;
-    private $api_url = 'https://api.boughto.co.uk/api';
+    private $api_url = 'https://boughtofeed.co.uk/api';
     private $location;
     private $api_key;
     private $authorization;
