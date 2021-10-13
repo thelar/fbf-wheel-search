@@ -162,6 +162,27 @@ class Fbf_Wheel_Search_Boughto_Api
         }
     }
 
+    public function get_chassis_detail($chassis_id)
+    {
+        $key = "boughto_chassis_{$chassis_id}";
+        $transient = get_transient($key);
+
+        if(!empty($transient)){
+            return $transient;
+        }else{
+            $url = sprintf('%s/vehicles/chassis/%d', $this->api_url, $chassis_id);
+            $response = wp_remote_get($url, $this->headers);
+
+            if(!is_wp_error($response)&&is_array($response)){
+                $data = json_decode(wp_remote_retrieve_body($response), true);
+                set_transient($key, $data, DAY_IN_SECONDS);
+                return $data;
+            }else{
+                return $response;
+            }
+        }
+    }
+
     public function get_wheels($chasis_id)
     {
         $key = "boughto_wheels_for_chasis_{$chasis_id}";
