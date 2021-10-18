@@ -43,6 +43,11 @@ class Fbf_Wheel_Search_Api
             exit;
         }
 
+        if($wp->request == 'api/v2/pb_get_chassis_detail'){
+            $this->get_chassis_detail();
+            exit;
+        }
+
         if($wp->request == 'api/v2/pb_get_tyre_sizes'){
             $this->get_tyre_sizes();
             exit;
@@ -88,9 +93,9 @@ class Fbf_Wheel_Search_Api
         if(!empty($data)){
             $i = 0;
             foreach($data as $chassis){
-                if(strpos(strtolower($chassis['name']), 'hidden')===false){
-                    $ds = DateTime::createFromFormat(DATE_ISO8601, $chassis['year_start']);
-                    $de = DateTime::createFromFormat(DATE_ISO8601, $chassis['year_end']);
+                if(strpos(strtolower($chassis['generation']['start_date']), 'hidden')===false){
+                    $ds = DateTime::createFromFormat('Y-m-d', $chassis['generation']['start_date']);
+                    $de = DateTime::createFromFormat('Y', $chassis['generation']['end_date']);
                     if($ds){
                         $data[$i]['ds'] = $ds->format('Y');
                     }
@@ -106,7 +111,7 @@ class Fbf_Wheel_Search_Api
 
         if(!empty($data)){
             usort($data, function($a, $b){
-                return [$a['name'], $b['ds']] <=> [$b['name'], $a['ds']];
+                return [$a['chassis']['display_name'], $b['ds']] <=> [$b['chassis']['display_name'], $a['ds']];
             });
         }
 
@@ -123,8 +128,8 @@ class Fbf_Wheel_Search_Api
 
         if(!is_wp_error($wheel_data)&&!array_key_exists('error', $wheel_data)) {
             $skus_ids = [];
-            foreach ($wheel_data['data'] as $wheel) {
-                $product_id = wc_get_product_id_by_sku($wheel['ean']);
+            foreach ($wheel_data['results'] as $wheel) {
+                $product_id = wc_get_product_id_by_sku($wheel['product_code']);
                 if ($product_id) {
                     $product = wc_get_product($product_id);
 
@@ -208,6 +213,16 @@ class Fbf_Wheel_Search_Api
         }
 
         $this->render_json($skus_ids);
+    }
+
+    private function get_chassis_detail()
+    {
+        $chassis_id = filter_var($_REQUEST['id'], FILTER_SANITIZE_STRING);
+        require_once plugin_dir_path(WP_PLUGIN_DIR . '/fbf-wheel-search/fbf-wheel-search.php') . 'includes/class-fbf-wheel-search-boughto-api.php';
+        $api = new \Fbf_Wheel_Search_Boughto_Api('fbf_wheel_search', 'fbf-wheel-search');
+        $chassis_data = $api->get_chassis_detail($chassis_id);
+
+        $this->render_json($chassis_data);
     }
 
     private function get_tyre_sizes()
