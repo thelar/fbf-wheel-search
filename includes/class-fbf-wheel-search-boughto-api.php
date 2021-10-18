@@ -275,9 +275,9 @@ class Fbf_Wheel_Search_Boughto_Api
     public function wheel_fits_chassis($product_id, $chassis_id)
     {
         $wheels = $this->get_wheels($chassis_id);
-        if(!empty($wheels['data'])){
+        if(!empty($wheels['results'])){
             $sku = wc_get_product($product_id)->get_sku();
-            $search = array_search($sku, array_column($wheels['data'], 'ean'));
+            $search = array_search($sku, array_column($wheels['results'], 'product_code'));
             if($search!==false){
                 return true;
             }
