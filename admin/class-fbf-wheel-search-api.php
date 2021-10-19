@@ -240,8 +240,8 @@ class Fbf_Wheel_Search_Api
         $api = new \Fbf_Wheel_Search_Boughto_Api('fbf_wheel_search', 'fbf-wheel-search');
         $tyres = $api->tyres_for_wheels($wheel_id, $chassis, $wheel_width_terms[0]->name, $wheel_diameter_terms[0]->name, $wheel_offset_terms[0]->name);
 
-        if(!key_exists('error', $tyres)&&key_exists('data', $tyres)){
-            $data = $tyres['data'];
+        if($tyres['status']==='success'&&$tyres['is_staggered']===false&&!empty($tyres['tyre_sizes'])){
+            $data = $tyres['tyre_sizes'];
         }
 
         $this->render_json($data);
@@ -285,27 +285,35 @@ class Fbf_Wheel_Search_Api
                 }else{
                     $manufacturer_id = WC()->session->get('fbf_manufacturer_id');
                 }
-                $all_chassis = $api->get_chasis($manufacturer_id);
+                /*$all_chassis = $api->get_chasis($manufacturer_id);
                 $index = array_search($chassis, array_column($all_chassis, 'id'));
-                $chassis_data = $all_chassis[$index];
+                $chassis_data = $all_chassis[$index];*/
+
+                $chassis_data = $api->get_chassis_detail($chassis);
 
                 //Retrieve the wheel data
-                $all_wheel_data = $api->get_wheels($chassis)['data'];
+                $all_wheel_data = $api->get_wheels($chassis)['results'];
                 $sku = $wheel->get_sku();
-                $index = array_search($sku, array_column($all_wheel_data, 'ean'));
+                $index = array_search($sku, array_column($all_wheel_data, 'product_code'));
                 $wheel_data = $all_wheel_data[$index];
 
                 if(!empty($wheel_data)&&!empty($chassis_data)){
                     //We can gather the bits of data for the wheel nut skus:
-                    $sku = sprintf($chassis_data['nutBolt_thread_type'] . $chassis_data['nut_or_bolt'] . $chassis_data['nut_bolt_hex'] . '%1$s', $wheel_data['seat_type']=='Flat'?'FLAT':'');
+                    $nut_or_bolt = null;
+                    if($chassis_data['chassis']['wheel_fasteners']=='Lug nuts'){
+                        $nut_or_bolt = 'nut';
+                    }else if($chassis_data['chassis']['wheel_fasteners']=='Lug bolts'){
+                        $nut_or_bolt = 'bolt';
+                    }
+                    $sku = sprintf($chassis_data['chassis']['thread_size'] . $nut_or_bolt . $chassis_data['chassis']['head_size'] . '%1$s', $wheel_data['seat_type'] == 'Flat' ? 'FLAT' : '');
                     $nuts = [
                         'title' => 'Wheel nuts for your wheel and vehicle:',
-                        'text' => sprintf('Display Accessories whose SKU\'s begin with: <strong>' . $chassis_data['nutBolt_thread_type'] . $chassis_data['nut_or_bolt'] . $chassis_data['nut_bolt_hex'] . '%1$s' . '</strong>', $wheel_data['seat_type']=='Flat'?'FLAT':''),
+                        'text' => sprintf('Display Accessories whose SKU\'s begin with: <strong>' . $chassis_data['chassis']['thread_size'] . $nut_or_bolt . $chassis_data['chassis']['head_size'] . '%1$s' . '</strong>', $wheel_data['seat_type'] == 'Flat' ? 'FLAT' : ''),
                         'item' => [
-                            'nutBolt_thread_type' => $chassis_data['nutBolt_thread_type'],
-                            'nut_or_bolt' => $chassis_data['nut_or_bolt'],
-                            'nub_bolt_hex' => $chassis_data['nut_bolt_hex'],
-                            'family_tags' => $wheel_data['family']['tags'][0],
+                            'nutBolt_thread_type' => $chassis_data['chassis']['thread_size'],
+                            'nut_or_bolt' => $nut_or_bolt,
+                            'nut_bolt_hex' => $chassis_data['chassis']['head_size'],
+                            'family_tags' => isset($wheel_data['family']['tags'][0])?:'',
                             'seat_type' => $wheel_data['seat_type'],
                             'sku' => $sku
                         ],
@@ -317,13 +325,13 @@ class Fbf_Wheel_Search_Api
                 }
 
                 if($steel_wheel){
-                    $sku = 'centrecap' . $wheel_data['centreBore'];
+                    $sku = 'centrecap' . $wheel_data['center_bore'];
                     $caps = [
                         'title' => 'Centre cap for your wheel and vehicle:',
                         'text' => 'Display Accessories whose SKU\'s begin with: <strong>' . $sku . '</strong>',
                         'item' => [
                             'prefix' => 'centrecap',
-                            'centreBore' => $wheel_data['centreBore'],
+                            'centreBore' => $wheel_data['center_bore'],
                             'sku' => $sku,
                         ]
                     ];
