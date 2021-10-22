@@ -305,10 +305,10 @@ class Fbf_Wheel_Search_Api
                     }else if($chassis_data['chassis']['wheel_fasteners']=='Lug bolts'){
                         $nut_or_bolt = 'bolt';
                     }
-                    $sku = sprintf($chassis_data['chassis']['thread_size'] . $nut_or_bolt . $chassis_data['chassis']['head_size'] . '%1$s', $wheel_data['seat_type'] == 'Flat' ? 'FLAT' : '');
+                    $sku = sprintf($chassis_data['chassis']['thread_size'] . $nut_or_bolt . $chassis_data['chassis']['head_size'] . '%1$s', $wheel_data['seat_type'] == 'flat' ? 'FLAT' : '');
                     $nuts = [
                         'title' => 'Wheel nuts for your wheel and vehicle:',
-                        'text' => sprintf('Display Accessories whose SKU\'s begin with: <strong>' . $chassis_data['chassis']['thread_size'] . $nut_or_bolt . $chassis_data['chassis']['head_size'] . '%1$s' . '</strong>', $wheel_data['seat_type'] == 'Flat' ? 'FLAT' : ''),
+                        'text' => sprintf('Display Accessories whose SKU\'s begin with: <strong>' . $chassis_data['chassis']['thread_size'] . $nut_or_bolt . $chassis_data['chassis']['head_size'] . '%1$s' . '</strong>', $wheel_data['seat_type'] == 'flat' ? 'FLAT' : ''),
                         'item' => [
                             'nutBolt_thread_type' => $chassis_data['chassis']['thread_size'],
                             'nut_or_bolt' => $nut_or_bolt,
