@@ -199,6 +199,8 @@ class Fbf_Wheel_Search_Public {
                 if($de){
                     $data[$i]['de'] = $de->format('Y');
                 }
+                $name = str_replace(' All Engines', '', $data[$i]['chassis']['display_name']); // Remove ' All Engines' from string
+                $data[$i]['chassis']['display_name'] =  $name;
                 $i++;
             }
         }
