@@ -71,7 +71,13 @@
 				dataType: 'json',
 				success: function(response){
 					if(response.status==='success'){
-						let option = '<option value="">Select chassis</option>';
+						let option;
+						if(is_landing_page){
+							option = '<option value="">Select Model</option>';
+						}else{
+							option = '<option value="">Select chassis</option>';
+						}
+
 						$.each(response.data, function(i, e){
 
 							console.log(e.chassis.display_name);
