@@ -53,6 +53,10 @@
 		});
 
 		window.populate_chasis = function ($chasis_select, manufacturer_id, is_packages_page, selected){
+			let is_landing_page = false;
+			if($('body').hasClass('single-landing-pages')){
+				is_landing_page = true;
+			}
 			$chasis_select.empty();
 			$chasis_select.append('<option>Please wait...</option>');
 			let data = {
@@ -105,7 +109,7 @@
 				},
 			});
 
-			if(!is_packages_page){
+			if(!is_packages_page && !is_landing_page){
 				$chasis_select.unbind('change');
 				$chasis_select.on('change', function(e){
 					let $manu;
@@ -120,6 +124,25 @@
 						let url = '/tyre-wheel-packages/chassis/' + $(this).val() + '/vehicle/' + $manu.val() + '/name/' + encodeURIComponent($manu.find(':selected').text() + ' ' + $chasis_select.find(':selected').text()) + '/';
 						//console.log(url);
 						window.location.href = url;
+					}
+				});
+			}else if(is_landing_page){
+				$chasis_select.unbind('change');
+				$chasis_select.on('change', function(e){
+					let $btn = $chasis_select.next();
+					let url = '/wheel-search-results/chassis/' + $(this).val() + '/vehicle/' + encodeURIComponent($chasis_select.find(':selected').text()) + '/';
+					$btn.attr('data-id', $(this).val());
+					$btn.attr('data-vehicle', encodeURIComponent($chasis_select.find(':selected').text()));
+					$btn.attr('data-url', url);
+					$btn.bind('click', function(){
+						window.location.href = url;
+					});
+
+					if($(this).val().length > 0){
+						$btn.prop('disabled', false);
+					}else{
+						$btn.prop('disabled', true);
+
 					}
 				});
 			}
