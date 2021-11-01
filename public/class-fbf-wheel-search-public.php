@@ -105,7 +105,7 @@ class Fbf_Wheel_Search_Public {
 		 * class.
 		 */
 
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/fbf-wheel-search-public.js?a=sdjkcd', array( 'jquery' ), $this->version, false );
+		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/fbf-wheel-search-public.js', array( 'jquery' ), $this->version, false );
 
         wp_localize_script( $this->plugin_name, 'fbf_wheel_search_ajax_object', [
             'ajax_url' => admin_url('admin-ajax.php'),
