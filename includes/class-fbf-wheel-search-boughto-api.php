@@ -248,7 +248,7 @@ class Fbf_Wheel_Search_Boughto_Api
                 // Tyres
                 //$url = sprintf("%s/search/tyres-for-wheel/%s/%s/%s?location=%d&upstep=both&wheel_offset=%d", $this->api_url, (int)$chassis, (float)$width, (int)$diameter, $this->location, $offset);
 
-                $url = sprintf("%s/search/wheels/%d/tyres?wheel_id=%d&tyre_sizes_only=1&ignore_no_stock=1&ignore_no_price=1", $this->api_url, (int)$chassis, (int)$wheel_id);
+                $url = sprintf("%s/search/wheels/%d/tyre-sizes?wheel_id=%d", $this->api_url, (int)$chassis, (int)$wheel_id);
 
                 $response = wp_remote_get($url, $this->headers);
 
