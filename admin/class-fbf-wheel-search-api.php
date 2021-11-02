@@ -68,7 +68,7 @@ class Fbf_Wheel_Search_Api
     {
         global $wpdb;
         $table = $wpdb->prefix . 'fbf_vehicle_manufacturers';
-        $sql = "SELECT * FROM $table WHERE enabled = 1";
+        $sql = "SELECT * FROM $table WHERE enabled = 1 ORDER BY display_name";
         $manufacturers = $wpdb->get_results($sql);
         $data = [];
 

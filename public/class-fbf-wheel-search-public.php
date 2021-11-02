@@ -132,7 +132,7 @@ class Fbf_Wheel_Search_Public {
     {
         global $wpdb;
         $table = $wpdb->prefix . 'fbf_vehicle_manufacturers';
-        $sql = "SELECT * FROM $table WHERE enabled = 1";
+        $sql = "SELECT * FROM $table WHERE enabled = 1 ORDER BY display_name";
         $manufacturers = $wpdb->get_results($sql);
         $html = '';
         $html.= sprintf('<select class="form-control mb-4" id="%s">', 'fbf-wheel-search-manufacturer-select');
