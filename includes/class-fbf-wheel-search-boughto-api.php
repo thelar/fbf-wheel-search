@@ -230,12 +230,12 @@ class Fbf_Wheel_Search_Boughto_Api
     {
         $wheels_data_key = "boughto_wheels_for_chasis_{$chassis}";
         if(!$wheels_data = get_transient($wheels_data_key)){
-            $wheels_data = $this->get_wheels($chassis)['results'];
+            $wheels_data = $this->get_wheels($chassis);
         }
         if(is_array($wheels_data) && !empty($wheels_data)){
             $product = wc_get_product($product_id);
             $sku = $product->get_sku();
-            $wheel_id = $wheels_data[array_search($sku, array_column($wheels_data, 'product_code'))]['id'];
+            $wheel_id = $wheels_data['results'][array_search($sku, array_column($wheels_data['results'], 'product_code'))]['id'];
         }
 
         if($wheel_id){
