@@ -185,18 +185,35 @@ class Fbf_Wheel_Search_Boughto_Api
 
     public function get_wheels($chasis_id)
     {
+        $num_results = 500;
         $key = "boughto_wheels_for_chasis_{$chasis_id}";
         $transient = get_transient($key);
 
         if(!empty($transient)){
             return $transient;
         }else{
-            $url = sprintf('%s/search/wheels?chassis_id=%d&ignore_no_price=1&ignore_no_stock=1&itemsPerPage=500', $this->api_url, $chasis_id);
+            $url = sprintf('%s/search/wheels?chassis_id=%d&ignore_no_price=1&ignore_no_stock=1&itemsPerPage=%d', $this->api_url, $chasis_id, $num_results);
 
             $response = wp_remote_get($url, $this->headers);
 
             if(!is_wp_error($response)&&is_array($response)){
                 $data = json_decode(wp_remote_retrieve_body($response), true);
+                $results = $data['results'];
+
+                // Check if we are getting all the results
+                if($data['pagination']['current_page'] < $data['pagination']['total_pages']){
+                    // Call again for each page and add to results
+                    for($i = $data['pagination']['current_page'] + 1;$i <= $data['pagination']['total_pages']; $i++){
+                        $url = $url . '&page=' . $i;
+                        $response = wp_remote_get($url, $this->headers);
+
+                        if(!is_wp_error($response)&&is_array($response)){
+                            $page_data = json_decode(wp_remote_retrieve_body($response), true);
+                            $results = array_merge($results, $page_data['results']);
+                        }
+                    }
+                }
+                $data['results'] = $results;
                 set_transient($key, $data, WEEK_IN_SECONDS);
                 return $data;
             }else{
