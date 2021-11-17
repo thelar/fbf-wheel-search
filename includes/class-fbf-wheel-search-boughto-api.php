@@ -204,8 +204,8 @@ class Fbf_Wheel_Search_Boughto_Api
                 if($data['pagination']['current_page'] < $data['pagination']['total_pages']){
                     // Call again for each page and add to results
                     for($i = $data['pagination']['current_page'] + 1;$i <= $data['pagination']['total_pages']; $i++){
-                        $url = $url . '&page=' . $i;
-                        $response = wp_remote_get($url, $this->headers);
+                        $page_url = $url . '&page=' . $i;
+                        $response = wp_remote_get($page_url, $this->headers);
 
                         if(!is_wp_error($response)&&is_array($response)){
                             $page_data = json_decode(wp_remote_retrieve_body($response), true);
