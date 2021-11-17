@@ -20,7 +20,8 @@ class Fbf_Wheel_Search_Boughto_Api
         $this->headers = [
             'headers' => [
                 "Authorization" => "Bearer " . $this->authorization
-            ]
+            ],
+            'timeout' => 20
         ];
     }
 
