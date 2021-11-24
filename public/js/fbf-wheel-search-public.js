@@ -30,32 +30,14 @@
 	 */
 
 	$(function() {
-		let $manufacturer_select = $('#fbf-wheel-search-manufacturer-select, #fbf-package-search-manufacturer-select');
-		$manufacturer_select.val($manufacturer_select.find('option:first').val());
-		let $chasis_select;
-		let is_packages_page;
-		if($('body').hasClass('tyre-wheel-packages')){
-			is_packages_page = true;
-		}else{
-			is_packages_page = false;
-		}
-
-		$manufacturer_select.on('change', function(e) {
-			let id = $(this).attr('id');
-			//console.log('id:' + id);
-			if(id==='fbf-wheel-search-manufacturer-select'){
-				$chasis_select = $('#fbf-wheel-search-chasis-select');
-			}else if(id==='fbf-package-search-manufacturer-select'){
-				$chasis_select = $('#fbf-package-search-chasis-select');
-			}
-			window.populate_chasis($chasis_select, $(this).val(), is_packages_page, false);
-
-		});
-
 		window.populate_chasis = function ($chasis_select, manufacturer_id, is_packages_page, selected){
 			let is_landing_page = false;
+			let update_session = true;
 			if($('body').hasClass('single-landing-pages')){
 				is_landing_page = true;
+			}
+			if($('body').hasClass('single-product')){
+				update_session = false;
 			}
 			$chasis_select.empty();
 			$chasis_select.append('<option>Please wait...</option>');
@@ -63,6 +45,7 @@
 				action: 'fbf_wheel_search_get_chasis',
 				manufacturer_id: manufacturer_id,
 				ajax_nonce: fbf_wheel_search_ajax_object.ajax_nonce,
+				update_session: update_session,
 			};
 			$.ajax({
 				url: fbf_wheel_search_ajax_object.ajax_url,
@@ -130,6 +113,35 @@
 						let url = '/tyre-wheel-packages/chassis/' + $(this).val() + '/vehicle/' + $manu.val() + '/name/' + encodeURIComponent($chasis_select.find(':selected').text()) + '/';
 						//console.log(url);
 						window.location.href = url;
+					}else if($(this).attr('id')==='fbf-fitment-chasis-select'){
+						let $info = $('#fitment-info');
+						$info.empty();
+						let data = {
+							action: 'fbf_wheel_fitment',
+							product_id: $(this).attr('data-product_id'),
+							chassis_id: $(this).val(),
+							ajax_nonce: fbf_wheel_search_ajax_object.ajax_nonce,
+							vehicle: $(this).find('option:selected').text(),
+						}
+						$.ajax({
+							url: fbf_wheel_search_ajax_object.ajax_url,
+							type: 'POST',
+							data: data,
+							dataType: 'json',
+							success: function (response) {
+								if(response.status==='success'){
+									let $fitting;
+									if(response.fits){
+										$fitting = $(`<p class="single-product__fitment-info success mt-4 mb-0"><i class="fas fa-check-circle fa-lg mr-2"></i> These wheels fit a <strong>${response.vehicle}</strong></p>`);
+										$('.single-product__add-basket-btn, .single-product__qty-select').prop('disabled', false);
+									}else{
+										$fitting = $(`<p class="single-product__fitment-info fail mt-4 mb-0"><i class="fas fa-times-circle fa-lg mr-2"></i> These wheels do not fit a <strong>${response.vehicle}</strong></p>`);
+										$('.single-product__add-basket-btn, .single-product__qty-select').prop('disabled', true);
+									}
+									$info.append($fitting);
+								}
+							}
+						});
 					}
 				});
 			}else if(is_landing_page){
@@ -153,6 +165,33 @@
 				});
 			}
 		};
+
+		let $manufacturer_select = $('#fbf-wheel-search-manufacturer-select, #fbf-package-search-manufacturer-select, #fbf-fitment-manufacturer-select');
+		if(!$manufacturer_select.attr('data-init_id')){
+			$manufacturer_select.val($manufacturer_select.find('option:first').val());
+		}else{
+			window.populate_chasis($('#fbf-fitment-chasis-select'), $manufacturer_select.attr('data-init_id'), false, $manufacturer_select.attr('data-chassis_id'));
+		}
+		let $chasis_select;
+		let is_packages_page;
+		if($('body').hasClass('tyre-wheel-packages')){
+			is_packages_page = true;
+		}else{
+			is_packages_page = false;
+		}
+
+		$manufacturer_select.on('change', function(e) {
+			let id = $(this).attr('id');
+			//console.log('id:' + id);
+			if(id==='fbf-wheel-search-manufacturer-select'){
+				$chasis_select = $('#fbf-wheel-search-chasis-select');
+			}else if(id==='fbf-package-search-manufacturer-select'){
+				$chasis_select = $('#fbf-package-search-chasis-select');
+			}else if(id==='fbf-fitment-manufacturer-select'){
+				$chasis_select = $('#fbf-fitment-chasis-select');
+			}
+			window.populate_chasis($chasis_select, $(this).val(), is_packages_page, false);
+		});
 	});
 
 })( jQuery );
