@@ -178,6 +178,7 @@ class Fbf_Wheel_Search_Public {
             $html.= sprintf('<select class="single-product__fitment-select mb-4" id="%s" data-init_id="%s" data-chassis_id="%s">', 'fbf-fitment-manufacturer-select', $manu_id, $chassis_id);
         }else{
             $html.= sprintf('<select class="single-product__fitment-select mb-4" id="%s">', 'fbf-fitment-manufacturer-select');
+            $manu_id = '';
         }
 
         $html.= sprintf('<option value="">Manufacturer</option>');
