@@ -230,7 +230,8 @@ class Fbf_Wheel_Search_Public {
         echo json_encode([
             'status' => 'success',
             'fits' => $fits,
-            'vehicle' => $vehicle
+            'vehicle' => $vehicle,
+            'id' => $chassis_id,
         ]);
         die();
 	}
