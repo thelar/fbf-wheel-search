@@ -136,7 +136,7 @@
 										$('.single-product__add-basket-btn, .single-product__qty-select').prop('disabled', false);
 									}else{
 										let link = `/wheel-search-results/chassis/${response.id}/vehicle/${encodeURIComponent(response.vehicle)}/`
-										$fitting = $(`<p class="single-product__fitment-info fail mt-4 mb-0"><i class="fas fa-times-circle fa-lg mr-2"></i> These wheels do not fit a <strong>${response.vehicle}</strong><br/><a href="${link}">Find wheels that fit your vehicle &gt;</a></p>`);
+										$fitting = $(`<p class="single-product__fitment-info fail mt-4 mb-0"><i class="fas fa-times-circle fa-lg mr-2"></i> These wheels do not fit a <strong>${response.vehicle}</strong><br/><a href="${link}" class="d-inline-block mt-2">Find wheels that fit your vehicle &gt;</a></p>`);
 										$('.single-product__add-basket-btn, .single-product__qty-select').prop('disabled', true);
 									}
 									$info.append($fitting);
