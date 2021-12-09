@@ -180,6 +180,14 @@ class Fbf_Wheel_Search_Public {
         return $html;
 	}
 
+    public static function chasis_dropdown_landing($brand_term_id)
+    {
+        $html = sprintf('<select class="form-control mb-0" id="%s" data-brand="%s">', 'fbf-package-search-chasis-select', $brand_term_id);
+        $html.= sprintf('<option value="">Select Chassis</option>');
+        $html.= '</select>';
+        return $html;
+	}
+
     public function fbf_wheel_search_get_chasis()
     {
         check_ajax_referer($this->option_name, 'ajax_nonce');
