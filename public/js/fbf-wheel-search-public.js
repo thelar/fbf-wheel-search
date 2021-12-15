@@ -172,20 +172,18 @@
 			}
 		};
 
-		let $manufacturer_select = $('#fbf-wheel-search-manufacturer-select, #fbf-package-search-manufacturer-select');
-		$manufacturer_select.val($manufacturer_select.find('option:first').val());
+		let $manufacturer_select = $('#fbf-wheel-search-manufacturer-select, #fbf-package-search-manufacturer-select, #fbf-fitment-manufacturer-select');
+		if(!$manufacturer_select.attr('data-init_id')){
+			$manufacturer_select.val($manufacturer_select.find('option:first').val());
+		}else{
+			window.populate_chasis($('#fbf-fitment-chasis-select'), $manufacturer_select.attr('data-init_id'), false, $manufacturer_select.attr('data-chassis_id'));
+		}
 		let $chasis_select;
 		let is_packages_page;
-		let is_landing_page = false;
-
 		if($('body').hasClass('tyre-wheel-packages')){
 			is_packages_page = true;
 		}else{
 			is_packages_page = false;
-		}
-
-		if($('body').hasClass('single-landing-pages')){
-			is_landing_page = true;
 		}
 
 		$manufacturer_select.on('change', function(e) {
@@ -193,14 +191,12 @@
 			//console.log('id:' + id);
 			if(id==='fbf-wheel-search-manufacturer-select'){
 				$chasis_select = $('#fbf-wheel-search-chasis-select');
-				if(is_landing_page){
-					$('.single-landing-pages__btn').prop('disabled', true);
-				}
 			}else if(id==='fbf-package-search-manufacturer-select'){
 				$chasis_select = $('#fbf-package-search-chasis-select');
+			}else if(id==='fbf-fitment-manufacturer-select'){
+				$chasis_select = $('#fbf-fitment-chasis-select');
 			}
 			window.populate_chasis($chasis_select, $(this).val(), is_packages_page, false);
-
 		});
 	});
 
