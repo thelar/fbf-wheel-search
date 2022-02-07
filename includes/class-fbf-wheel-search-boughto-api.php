@@ -302,4 +302,31 @@ class Fbf_Wheel_Search_Boughto_Api
         }
         return false;
     }
+
+    /**
+     * Get upsteps for chassis
+     *
+     * @param $chassis_id
+     * @return array
+     */
+    public function get_upsteps($chassis_id)
+    {
+        $key = "boughto_upsteps_for_chassis_{$chassis_id}";
+        $transient = get_transient($key);
+
+        if(!empty($transient)){
+            $data = $transient;
+        }else{
+            $url = sprintf("%s/vehicles/chassis/%d/upsteps", $this->api_url, (int)$chassis_id);
+
+            $response = wp_remote_get($url, $this->headers);
+
+            if (is_array($response)) {
+                $data = json_decode(wp_remote_retrieve_body($response), true);
+                $data['url'] = $url;
+                set_transient($key, $data, WEEK_IN_SECONDS);
+            }
+        }
+        return $data;
+    }
 }
