@@ -283,6 +283,31 @@ class Fbf_Wheel_Search_Boughto_Api
         }
     }
 
+    public function tyre_sizes($chassis, $wheel_id)
+    {
+        $key = "boughto_tyre_for_wheel_{$wheel_id}_{$chassis}";
+        $transient = get_transient($key);
+
+        if(!empty($transient)){
+            $data = $transient;
+        }else{
+            // Tyres
+            //$url = sprintf("%s/search/tyres-for-wheel/%s/%s/%s?location=%d&upstep=both&wheel_offset=%d", $this->api_url, (int)$chassis, (float)$width, (int)$diameter, $this->location, $offset);
+
+            $url = sprintf("%s/search/wheels/%d/tyre-sizes?wheel_id=%d", $this->api_url, (int)$chassis, (int)$wheel_id);
+
+            $response = wp_remote_get($url, $this->headers);
+
+            $tyre_sizes = array();
+            if (is_array($response)) {
+                $data = json_decode(wp_remote_retrieve_body($response), true);
+                $data['url'] = $url;
+                set_transient($key, $data, WEEK_IN_SECONDS);
+            }
+        }
+        return $data;
+    }
+
     /**
      * Check whether a given product_id (wheel) fits a chassis
      *
