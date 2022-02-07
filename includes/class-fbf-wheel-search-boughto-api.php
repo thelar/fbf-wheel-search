@@ -10,7 +10,7 @@ class Fbf_Wheel_Search_Boughto_Api
     private $api_key;
     private $authorization;
     private $headers;
-    private $cache = true;
+    private $cache = true; // Flag for whether to use transient data or not, setting to (bool) false will force it to query boughto API for every call
     public function __construct($option_name, $plugin_name)
     {
         $this->option_name = $option_name;
