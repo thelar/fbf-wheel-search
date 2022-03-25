@@ -193,7 +193,7 @@ class Fbf_Wheel_Search_Boughto_Api
         if(!empty($transient)){
             return $transient;
         }else{
-            $url = sprintf('%s/search/wheels?chassis_id=%d&ignore_no_price=1&ignore_no_stock=1&itemsPerPage=%d', $this->api_url, $chasis_id, $num_results);
+            $url = sprintf('%s/search/wheels?chassis_id=%d&ignore_no_price=1&ignore_no_stock=1&itemsPerPage=%d&use_load_rating=1', $this->api_url, $chasis_id, $num_results);
 
             $response = wp_remote_get($url, $this->headers);
 
