@@ -135,7 +135,7 @@ class Fbf_Wheel_Search_Public {
         $sql = "SELECT * FROM $table WHERE enabled = 1 ORDER BY display_name";
         $manufacturers = $wpdb->get_results($sql);
         $html = '<div class="form-group">';
-        $html.= sprintf('<label for="%s">%s</label>', 'Make', 'fbf-wheel-search-manufacturer-select');
+        $html.= sprintf('<label for="%s">%s</label>', 'fbf-wheel-search-manufacturer-select', 'Make');
         $html.= sprintf('<select class="form-control mb-4" id="%s">', 'fbf-wheel-search-manufacturer-select');
         $html.= sprintf('<option value="">Manufacturer</option>');
         if($manufacturers!==false){
@@ -197,7 +197,7 @@ class Fbf_Wheel_Search_Public {
     public static function chasis_dropdown()
     {
         $html = '<div class="form-group">';
-        $html.= sprintf('<label for="%s">%s</label>', 'Model', 'fbf-wheel-search-chasis-select');
+        $html.= sprintf('<label for="%s">%s</label>', 'fbf-wheel-search-chasis-select', 'Model');
         $html.= sprintf('<select class="form-control mb-0" id="%s">', 'fbf-wheel-search-chasis-select');
         $html.= sprintf('<option value="">Select Chassis</option>');
         $html.= '</select>';
