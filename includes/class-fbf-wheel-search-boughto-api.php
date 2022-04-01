@@ -10,6 +10,7 @@ class Fbf_Wheel_Search_Boughto_Api
     private $api_key;
     private $authorization;
     private $headers;
+    private $cache = false; // Flag for whether to use transient data or not, setting to (bool) false will force it to query boughto API for every call
     public function __construct($option_name, $plugin_name)
     {
         $this->option_name = $option_name;
@@ -40,7 +41,6 @@ class Fbf_Wheel_Search_Boughto_Api
                 $manufacturers = $data['manufacturers'];
             }
         }
-
 
 
         //Retrieved boughto ids
@@ -133,7 +133,7 @@ class Fbf_Wheel_Search_Boughto_Api
         $key = "boughto_manufacturer_{$manu_id}_chassis";
         $transient = get_transient($key);
 
-        if (!empty($transient)) {
+        if (!empty($transient)&&$this->cache) {
             return $transient;
         } else {
             $url = sprintf('%s/vehicles/manufacturers/%d/chassis', $this->api_url, (int)$manu_id);
@@ -168,7 +168,7 @@ class Fbf_Wheel_Search_Boughto_Api
         $key = "boughto_chassis_{$chassis_id}";
         $transient = get_transient($key);
 
-        if(!empty($transient)){
+        if(!empty($transient)&&$this->cache){
             return $transient;
         }else{
             $url = sprintf('%s/vehicles/chassis/%d', $this->api_url, $chassis_id);
@@ -190,7 +190,7 @@ class Fbf_Wheel_Search_Boughto_Api
         $key = "boughto_wheels_for_chasis_{$chasis_id}";
         $transient = get_transient($key);
 
-        if(!empty($transient)){
+        if(!empty($transient)&&$this->cache){
             return $transient;
         }else{
             $url = sprintf('%s/search/wheels?chassis_id=%d&ignore_no_price=1&ignore_no_stock=1&itemsPerPage=%d&use_load_rating=1', $this->api_url, $chasis_id, $num_results);
@@ -228,7 +228,7 @@ class Fbf_Wheel_Search_Boughto_Api
         $key = "boughto_v4_wheels_for_chasis_{$chasis_id}";
         $transient = get_transient($key);
 
-        if(!empty($transient)){
+        if(!empty($transient)&&$this->cache){
             return $transient;
         }else{
             $url = sprintf('%s/search/wheels?chassis_id=%d&itemsPerPage=500', $this->api_url, $chasis_id);
@@ -247,7 +247,7 @@ class Fbf_Wheel_Search_Boughto_Api
     public function tyres_for_wheels($product_id, $chassis, $width, $diameter, $offset)
     {
         $wheels_data_key = "boughto_wheels_for_chasis_{$chassis}";
-        if(!$wheels_data = get_transient($wheels_data_key)){
+        if(!$wheels_data = get_transient($wheels_data_key)&&$this->cache){
             $wheels_data = $this->get_wheels($chassis);
         }
         if(is_array($wheels_data) && !empty($wheels_data)){
@@ -288,7 +288,7 @@ class Fbf_Wheel_Search_Boughto_Api
         $key = "boughto_tyre_for_wheel_{$wheel_id}_{$chassis}";
         $transient = get_transient($key);
 
-        if(!empty($transient)){
+        if(!empty($transient)&&$this->cache){
             $data = $transient;
         }else{
             // Tyres
@@ -339,7 +339,7 @@ class Fbf_Wheel_Search_Boughto_Api
         $key = "boughto_upsteps_for_chassis_{$chassis_id}";
         $transient = get_transient($key);
 
-        if(!empty($transient)){
+        if(!empty($transient)&&$this->cache){
             $data = $transient;
         }else{
             $url = sprintf("%s/vehicles/chassis/%d/upsteps", $this->api_url, (int)$chassis_id);
