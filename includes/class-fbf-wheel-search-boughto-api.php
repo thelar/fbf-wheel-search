@@ -255,7 +255,6 @@ class Fbf_Wheel_Search_Boughto_Api
             $sku = $product->get_sku();
             $wheel_id = $wheels_data['results'][array_search($sku, array_column($wheels_data['results'], 'product_code'))]['id'];
         }
-
         if($wheel_id){
             $key = "boughto_tyre_for_wheel_{$wheel_id}_{$chassis}";
             $transient = get_transient($key);
