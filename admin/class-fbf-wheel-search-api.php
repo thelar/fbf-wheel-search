@@ -130,6 +130,7 @@ class Fbf_Wheel_Search_Api
             $skus_ids = [];
             foreach ($wheel_data['results'] as $wheel) {
                 $product_id = wc_get_product_id_by_sku($wheel['product_code']);
+                $boughto_id = $wheel['id'];
                 if ($product_id) {
                     $product = wc_get_product($product_id);
 
@@ -179,6 +180,7 @@ class Fbf_Wheel_Search_Api
                             $skus_ids[] = [
                                 //Add all the product data here
                                 'id' => $product_id,
+                                'boughto_id' => $boughto_id,
                                 'name' => get_the_title($product_id),
                                 'price' => $price,
                                 'price_exc' => $price_exc,
