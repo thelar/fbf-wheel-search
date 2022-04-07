@@ -233,14 +233,10 @@ class Fbf_Wheel_Search_Api
         $wheel_id = filter_var($_REQUEST['wheel_id'], FILTER_SANITIZE_STRING);
         $chassis = filter_var($_REQUEST['chassis_id'], FILTER_SANITIZE_STRING);
 
-        $wheel_width_terms = wc_get_product_terms($wheel_id, 'pa_wheel-width');
-        $wheel_diameter_terms = wc_get_product_terms($wheel_id, 'pa_wheel-size');
-        $wheel_offset_terms = wc_get_product_terms($wheel_id, 'pa_wheel-offset');
-
         include_once(ABSPATH.'wp-admin/includes/plugin.php');
         require_once plugin_dir_path(WP_PLUGIN_DIR . '/fbf-wheel-search/fbf-wheel-search.php') . 'includes/class-fbf-wheel-search-boughto-api.php';
         $api = new \Fbf_Wheel_Search_Boughto_Api('fbf_wheel_search', 'fbf-wheel-search');
-        $tyres = $api->tyres_for_wheels($wheel_id, $chassis, $wheel_width_terms[0]->name, $wheel_diameter_terms[0]->name, $wheel_offset_terms[0]->name);
+        $tyres = $api->tyre_sizes($chassis, $wheel_id);
 
         if($tyres['status']==='success'&&$tyres['is_staggered']===false&&!empty($tyres['tyre_sizes'])){
             $data = $tyres['tyre_sizes'];
