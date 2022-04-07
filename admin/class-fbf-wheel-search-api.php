@@ -180,7 +180,7 @@ class Fbf_Wheel_Search_Api
                             $skus_ids[] = [
                                 //Add all the product data here
                                 'id' => $boughto_id,
-                                'boughto_id' => $boughto_id,
+                                'post_id' => $product_id,
                                 'name' => get_the_title($product_id),
                                 'price' => $price,
                                 'price_exc' => $price_exc,
