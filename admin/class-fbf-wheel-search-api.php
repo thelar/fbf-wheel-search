@@ -179,7 +179,7 @@ class Fbf_Wheel_Search_Api
                         if(in_array($brand_id, $included_brands)){
                             $skus_ids[] = [
                                 //Add all the product data here
-                                'id' => $product_id,
+                                'id' => $boughto_id,
                                 'boughto_id' => $boughto_id,
                                 'name' => get_the_title($product_id),
                                 'price' => $price,
