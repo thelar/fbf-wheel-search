@@ -149,7 +149,7 @@
 				$chasis_select.unbind('change');
 				$chasis_select.on('change', function(e){
 					console.log('landing page change');
-					let $btn = $chasis_select.next();
+					let $btn = $chasis_select.parents('.form-group')	.next();
 					let url = '/wheel-search-results/chassis/' + $(this).val() + '/vehicle/' + encodeURIComponent($chasis_select.find(':selected').text()) + '/';
 					$btn.attr('data-id', $(this).val());
 					$btn.attr('data-vehicle', encodeURIComponent($chasis_select.find(':selected').text()));
