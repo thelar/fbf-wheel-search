@@ -151,16 +151,18 @@
 					console.log('landing page change');
 					//let $btn = $chasis_select.parents('.form-group').next();
 					let $btn = $('.single-landing-pages__btn');
+					$btn.unbind('click'); // Removes the click event
 					let url = '/wheel-search-results/chassis/' + $(this).val() + '/vehicle/' + encodeURIComponent($chasis_select.find(':selected').text()) + '/';
 					$btn.attr('data-id', $(this).val());
 					$btn.attr('data-vehicle', encodeURIComponent($chasis_select.find(':selected').text()));
 					$btn.attr('data-url', url);
 					$btn.bind('click', function(){
-						//console.log('button clicked');
-						if($(this).attr('data-brand')!==''){
+						console.log('button clicked');
+						window.landing_page_search();
+						/*if($(this).attr('data-brand')!==''){
 							url+= '#pa_brand-name=' + $(this).attr('data-brand');
 						}
-						window.location.href = url;
+						window.location.href = url;*/
 					});
 
 					if($(this).val().length > 0){
