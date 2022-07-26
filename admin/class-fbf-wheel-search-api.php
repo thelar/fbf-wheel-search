@@ -541,6 +541,7 @@ class Fbf_Wheel_Search_Api
                         'currency' => get_woocommerce_currency_symbol(),
                         'sku' => $product->get_sku(),
                         'image' => has_post_thumbnail($product->get_id()) ? wp_get_attachment_image_src(get_post_thumbnail_id($product->get_id()), 'fbf-300-x')[0] : wc_placeholder_img_src('fbf-300-x'),
+                        'image_lg' => has_post_thumbnail($product->get_id())?wp_get_attachment_image_src(get_post_thumbnail_id($product->get_id()), 'fbf-1200-x')[0]:wc_placeholder_img_src('fbf-1200-x'),
                         'button' => $button,
                         'options' => $options,
                         'stock' => $product->get_stock_quantity(),
