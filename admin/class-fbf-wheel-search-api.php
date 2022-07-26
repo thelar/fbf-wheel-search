@@ -313,7 +313,7 @@ class Fbf_Wheel_Search_Api
                         'above_below' => 'both'
                     ];
                 }
-                if ($items = $this->get_upsell_items(($chassis !== 'undefined' ? $chassis : ''), $sku, 1)) {
+                if ($items = $this->get_upsell_items(($chassis !== 'undefined' ? $chassis : ''), $sku, 1, $pc)) {
                     $nuts['items'] = $items;
                 }
             }
@@ -331,7 +331,7 @@ class Fbf_Wheel_Search_Api
                         'sku' => $sku,
                     ]
                 ];
-                if ($items = $this->get_upsell_items(($chassis !== 'undefined' ? $chassis : ''), $sku, 1)) {
+                if ($items = $this->get_upsell_items(($chassis !== 'undefined' ? $chassis : ''), $sku, 1, $pc)) {
                     $caps['items'] = $items;
                 }
             }
@@ -394,7 +394,7 @@ class Fbf_Wheel_Search_Api
         ]);
     }
 
-    private function get_upsell_items($chassis, $sku, $qty, $ids = false)
+    private function get_upsell_items($chassis, $sku, $qty, $pc=null, $ids = false)
     {
         //Pull out the matching products
         if($sku !== false){
@@ -498,6 +498,13 @@ class Fbf_Wheel_Search_Api
                     }
                     $single_price = wc_get_price_including_tax($product);
                     $price = number_format((wc_get_price_including_tax($product)), 2);
+                    $price_exc = number_format(wc_get_price_excluding_tax($product), 2);
+                    if(!is_null($pc)&&$pc>0){
+                        $price+= ($price/100) * $pc;
+                        $price_exc+= ($price_exc/100) * $pc;
+                        $price = number_format($price, 2);
+                        $price_exc = number_format($price_exc, 2);
+                    }
                     $button = sprintf('<a href="/?add-multiple-to-cart=%1$s:1" data-quantity="1" class="button product_type_simple add_multiple_to_cart_button ajax_add_to_cart" data-product_id="%1$s" data-product_sku="%2$s" data-chassis-id="%4$s" rel="nofollow">Add to basket</a>', $product->get_id(), $product->get_sku(), $max_packages, $chassis);
 
                     //Category
@@ -529,6 +536,7 @@ class Fbf_Wheel_Search_Api
                         'title' => $product->get_title(),
                         'url' => $product->get_permalink(),
                         'price' => $price,
+                        'price_exc' => $price_exc,
                         'single_price' => $single_price,
                         'currency' => get_woocommerce_currency_symbol(),
                         'sku' => $product->get_sku(),
