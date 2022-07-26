@@ -247,118 +247,140 @@ class Fbf_Wheel_Search_Api
 
     private function get_accessories($pc=null)
     {
-        global $wp_query;
-        $response = [];
+        // Wheels are in the basket
+        // Nuts & Caps
 
-        if(isset($_REQUEST['chassis'])&&isset($_REQUEST['wheel_id'])){
-            $chassis = filter_var($_REQUEST['chassis'], FILTER_SANITIZE_STRING);
-            $product_id = filter_var($_REQUEST['wheel_id'], FILTER_SANITIZE_STRING);
+        $nuts = [];
+        $caps = [];
+        $low_nut_bolt_stock = true;
 
-            $wheel = false;
-            $steel_wheel = false;
+        // Loop through the wheels
+        if(isset($_REQUEST['chassis'])&&isset($_REQUEST['wheel_id'])) {
+            require_once plugin_dir_path(WP_PLUGIN_DIR . '/fbf-wheel-search/fbf-wheel-search.php') . 'includes/class-fbf-wheel-search-boughto-api.php';
+            $api = new \Fbf_Wheel_Search_Boughto_Api('fbf_wheel_search', 'fbf-wheel-search');
+            $wheel_id = $_REQUEST['wheel_id'];
 
-            $product = wc_get_product($product_id);
-            $category = $product->get_category_ids()[0];
-            if($category){
-                $term = get_term_by('id', $category, 'product_cat');
-                if($term->name=='Alloy Wheel'||$term->name=='Steel Wheel'){
-                    $wheel = $product;
-
-                    if($term->name=='Steel Wheel'){
-                        $steel_wheel = $product;
-                    }
-                }
+            // Pretty sure that there is an individual basket item even when same wheel is fitted to different chassis, so OK to use $wheel['wheel_chassis_id'][0]
+            $chassis = $_REQUEST['chassis'];
+            $trans_key = "boughto_chassis_{$chassis}_manufacturer";
+            if (get_transient($trans_key)) {
+                $manufacturer_id = get_transient($trans_key);
+            } else {
+                $manufacturer_id = WC()->session->get('fbf_manufacturer_id');
             }
+            $chassis_data = $api->get_chassis_detail($chassis);
 
-            //Look for wheel nuts here - can only offer them when we've searched for a wheel and have the chassis id
-            if($chassis && $chassis != 'undefined'){
-                require_once plugin_dir_path(WP_PLUGIN_DIR . '/fbf-wheel-search/fbf-wheel-search.php') . 'includes/class-fbf-wheel-search-boughto-api.php';
-                $api = new \Fbf_Wheel_Search_Boughto_Api('fbf_wheel_search', 'fbf-wheel-search');
+            //Retrieve the wheel data
+            $all_wheel_data = $api->get_wheels($chassis)['results'];
+            $wheel_product = wc_get_product($wheel_id);
+            $sku = $wheel_product->get_sku();
+            $index = array_search($sku, array_column($all_wheel_data, 'product_code'));
+            $wheel_data = $all_wheel_data[$index];
 
-                //Retrieve the selected manufacturer data
-                //Get the manufacturer id first via a transient, then by session if not set
-                $trans_key = "boughto_chassis_{$chassis}_manufacturer";
-                if(get_transient($trans_key)) {
-                    $manufacturer_id = get_transient($trans_key);
-                }else{
-                    $manufacturer_id = WC()->session->get('fbf_manufacturer_id');
+
+            if (!empty($wheel_data) && !empty($chassis_data)) {
+                //We can gather the bits of data for the wheel nut skus:
+                $nut_or_bolt = null;
+                if ($chassis_data['chassis']['wheel_fasteners'] == 'Lug nuts') {
+                    $nut_or_bolt = 'nut';
+                } else if ($chassis_data['chassis']['wheel_fasteners'] == 'Lug bolts') {
+                    $nut_or_bolt = 'bolt';
                 }
-                /*$all_chassis = $api->get_chasis($manufacturer_id);
-                $index = array_search($chassis, array_column($all_chassis, 'id'));
-                $chassis_data = $all_chassis[$index];*/
-
-                $chassis_data = $api->get_chassis_detail($chassis);
-
-                //Retrieve the wheel data
-                $all_wheel_data = $api->get_wheels($chassis)['results'];
-                $sku = $wheel->get_sku();
-                $index = array_search($sku, array_column($all_wheel_data, 'product_code'));
-                $wheel_data = $all_wheel_data[$index];
-
-                if(!empty($wheel_data)&&!empty($chassis_data)){
-                    //We can gather the bits of data for the wheel nut skus:
-                    $nut_or_bolt = null;
-                    if($chassis_data['chassis']['wheel_fasteners']=='Lug nuts'){
-                        $nut_or_bolt = 'nut';
-                    }else if($chassis_data['chassis']['wheel_fasteners']=='Lug bolts'){
-                        $nut_or_bolt = 'bolt';
-                    }
-                    $sku = sprintf($chassis_data['chassis']['thread_size'] . $nut_or_bolt . $chassis_data['chassis']['head_size'] . '%1$s', $wheel_data['seat_type'] == 'flat' ? 'FLAT' : '');
-                    $nuts = [
-                        'title' => 'Wheel nuts for your wheel and vehicle:',
-                        'text' => sprintf('Display Accessories whose SKU\'s begin with: <strong>' . $chassis_data['chassis']['thread_size'] . $nut_or_bolt . $chassis_data['chassis']['head_size'] . '%1$s' . '</strong>', $wheel_data['seat_type'] == 'flat' ? 'FLAT' : ''),
-                        'item' => [
-                            'nutBolt_thread_type' => $chassis_data['chassis']['thread_size'],
-                            'nut_or_bolt' => $nut_or_bolt,
-                            'nut_bolt_hex' => $chassis_data['chassis']['head_size'],
-                            'family_tags' => isset($wheel_data['family']['tags'][0])?:'',
-                            'seat_type' => $wheel_data['seat_type'],
-                            'sku' => $sku
-                        ],
-                    ];
-                    if($items = $this->get_upsell_items($chassis, $sku, 1, $pc)){
-                        $nuts['items'] = $items;
-                    }
-                    $response[] = $nuts;
-                }
-
-                if($steel_wheel){
-                    $sku = 'centrecap' . $wheel_data['center_bore'];
-                    $caps = [
-                        'title' => 'Centre cap for your wheel and vehicle:',
-                        'text' => 'Display Accessories whose SKU\'s begin with: <strong>' . $sku . '</strong>',
-                        'item' => [
-                            'prefix' => 'centrecap',
-                            'centreBore' => $wheel_data['center_bore'],
-                            'sku' => $sku,
-                        ]
-                    ];
-                    if($items = $this->get_upsell_items($chassis, $sku, 1, $pc)){
-                        $caps['items'] = $items;
-                    }
-                    $response[] = $caps;
-                }
-            }
-
-            /*//Generic upsells
-            $generic_upsells = get_field('upsells', 'options');
-            $generic_upsell_ids = [];
-            if($generic_upsells){
-                $generic = [
-                    'title' => 'Generic upsells:',
+                $sku = sprintf($chassis_data['chassis']['thread_size'] . $nut_or_bolt . $chassis_data['chassis']['head_size'] . '%1$s', $wheel_data['seat_type'] == 'flat' ? 'FLAT' : '');
+                $nuts = [
+                    'title' => 'Wheel nuts for your wheel and vehicle:',
+                    'text' => sprintf('Display Accessories whose SKU\'s begin with: <strong>' . $chassis_data['chassis']['thread_size'] . $nut_or_bolt . $chassis_data['chassis']['head_size'] . '%1$s' . '</strong>', $wheel_data['seat_type'] == 'flat' ? 'FLAT' : ''),
+                    'item' => [
+                        'nutBolt_thread_type' => $chassis_data['chassis']['thread_size'],
+                        'nut_or_bolt' => $nut_or_bolt,
+                        'nut_bolt_hex' => $chassis_data['chassis']['head_size'],
+                        'family_tags' => isset($wheel_data['family']['tags'][0]) ?: '',
+                        'seat_type' => $wheel_data['seat_type'],
+                        'sku' => $sku
+                    ],
                 ];
-                foreach($generic_upsells as $upsell){
-                    $generic_upsell_ids[] = $upsell->ID;
-                    $generic['item'][] = [
-                        'id' => $upsell->ID,
-                        'title' => get_the_title($upsell->ID),
-                    ];x
+
+                // If there is a low stock level of nuts and bolts
+                if ($low_nut_bolt_stock) {
+                    $base_sku = $chassis_data['chassis']['thread_size'] . $nut_or_bolt . '%s';
+                    if ($wheel_data['seat_type'] == 'flat') {
+                        $base_sku .= 'FLAT';
+                    }
+                    $sku = [
+                        'base' => $base_sku,
+                        'value' => $chassis_data['chassis']['head_size'],
+                        'variance' => 5,
+                        'above_below' => 'both'
+                    ];
                 }
-                if($items = $this->get_upsell_items($chassis, false, 1, $pc, $generic_upsell_ids)){
-                    $generic['items'] = $items;
+                if ($items = $this->get_upsell_items(($chassis !== 'undefined' ? $chassis : ''), $sku, 1)) {
+                    $nuts['items'] = $items;
                 }
-                $response[] = $generic;
-            }*/
+            }
+
+            $term = get_term_by('id', $wheel_product->get_category_ids()[0], 'product_cat');
+            if($term->name=='Steel Wheel'){
+                // It's a steel wheel
+                $sku = 'centrecap' . $wheel_data['center_bore'];
+                $caps = [
+                    'title' => 'Centre cap for your wheel and vehicle:',
+                    'text' => 'Display Accessories whose SKU\'s begin with: <strong>' . $sku . '</strong>',
+                    'item' => [
+                        'prefix' => 'centrecap',
+                        'centreBore' => $wheel_data['center_bore'],
+                        'sku' => $sku,
+                    ]
+                ];
+                if ($items = $this->get_upsell_items(($chassis !== 'undefined' ? $chassis : ''), $sku, 1)) {
+                    $caps['items'] = $items;
+                }
+            }
+            $response[] = $nuts;
+            $response[] = $caps;
+        }
+
+        if(!empty($nuts['items'])){
+            $r_nuts = [];
+            foreach($nuts['items'] as $n_itm){
+                $qty_required = 1;
+                if($n_itm['stock'] >= $qty_required){
+                    $nut_product = wc_get_product($n_itm['id']);
+                    $r_nuts[$n_itm['id']] = [
+                        'name' => $n_itm['title'],
+                        'desc' => $this->get_meta($n_itm['id'], '_accessory_description'),
+                        'short_desc' => $this->get_meta($n_itm['id'], '_accessory_abbreviated_desc'),
+                        'quantity_in_pack' => $this->get_meta($n_itm['id'], '_quantity_in_pack'),
+                        'sku' => $n_itm['sku'],
+                        'id' => $n_itm['id'],
+                        'qty' => $qty_required,
+                        'single_price' => wc_get_price_including_tax($nut_product),
+                        'type' => 'nut',
+                        'image' => has_post_thumbnail($n_itm['id']) ? wp_get_attachment_image_src(get_post_thumbnail_id($n_itm['id']), 'fbf-300-x')[0] : wc_placeholder_img_src('fbf-300-x'),
+                    ];
+                }
+            }
+        }
+
+        if (!empty($caps['items'])) {
+            $r_caps = [];
+            foreach ($caps['items'] as $c_itm) {
+                $qty_required = 1;
+                if ($c_itm['stock'] >= $qty_required) {
+                    $cap_product = wc_get_product($c_itm['id']);
+                    $r_caps[$c_itm['id']] = [
+                        'name' => $c_itm['title'],
+                        'desc' => $this->get_meta($c_itm['id'], '_accessory_description'),
+                        'short_desc' => $this->get_meta($c_itm['id'], '_accessory_abbreviated_desc'),
+                        'quantity_in_pack' => $this->get_meta($c_itm['id'], '_quantity_in_pack'),
+                        'sku' => $c_itm['sku'],
+                        'id' => $c_itm['id'],
+                        'qty' => $this->get_meta($c_itm['id'], '_quantity_in_pack') > 1 ? ceil($qty_required / $this->get_meta($c_itm['id'], '_quantity_in_pack')) : $qty_required,
+                        'single_price' => wc_get_price_including_tax($cap_product),
+                        'type' => 'cap',
+                        'image' => has_post_thumbnail($c_itm['id']) ? wp_get_attachment_image_src(get_post_thumbnail_id($c_itm['id']), 'fbf-300-x')[0] : wc_placeholder_img_src('fbf-300-x')
+                    ];
+                }
+            }
         }
 
 
@@ -372,26 +394,75 @@ class Fbf_Wheel_Search_Api
         ]);
     }
 
-    private function get_upsell_items($chassis, $sku, $qty, $pc=null, $ids=false)
+    private function get_upsell_items($chassis, $sku, $qty, $ids = false)
     {
         //Pull out the matching products
-        if($sku!==false){
+        if($sku !== false){
             global $wpdb;
-            if(preg_match('/FLAT$/', $sku)){
-                $query = 'SELECT * FROM ' . $wpdb->prefix . 'postmeta WHERE meta_key = \'_sku\' AND meta_value LIKE \'' . strtoupper($sku) . '%\'';
+            if(!is_array($sku)){
+                if(preg_match('/FLAT$/', $sku)){
+                    $query = 'SELECT * FROM ' . $wpdb->prefix . 'postmeta WHERE meta_key = \'_sku\' AND meta_value LIKE \'' . strtoupper($sku) . '%\'';
+                } else {
+                    $query = 'SELECT * FROM ' . $wpdb->prefix . 'postmeta WHERE meta_key = \'_sku\' AND meta_value LIKE \'' . strtoupper($sku) . '%\' AND meta_value NOT LIKE \'%FLAT%\'';
+                }
+                $results = $wpdb->get_results($query);
+                $ids = [];
             }else{
-                $query = 'SELECT * FROM ' . $wpdb->prefix . 'postmeta WHERE meta_key = \'_sku\' AND meta_value LIKE \'' . strtoupper($sku) . '%\' AND meta_value NOT LIKE \'%FLAT%\'';
-            }
+                // Low stock so need to look for range of SKU's
+                $s = $sku;
 
-            $results = $wpdb->get_results($query);
-            $ids = [];
+                switch($sku['above_below']){
+                    case 'both':
+                        $start = $sku['value'] - $sku['variance'];
+                        $end = $sku['value'] + $sku['variance'];
+                        break;
+                    case 'above':
+                        $start = $sku['value'];
+                        $end = $sku['value'] + $sku['variance'];
+                        break;
+                    case 'below':
+                        $start = $sku['value'] - $sku['variance'];
+                        $end = $sku['value'];
+                        break;
+                    default:
+                        break;
+                }
+
+                // First check if any sku's exactly match sku
+                $exact_sku = sprintf($sku['base'], $sku['value']);
+                if(preg_match('/FLAT$/', $exact_sku)){
+                    $exact_query = 'SELECT * FROM ' . $wpdb->prefix . 'postmeta WHERE meta_key = \'_sku\' AND meta_value LIKE \'' . strtoupper($exact_sku) . '%\'';
+                } else {
+                    $exact_query = 'SELECT * FROM ' . $wpdb->prefix . 'postmeta WHERE meta_key = \'_sku\' AND meta_value LIKE \'' . strtoupper($exact_sku) . '%\' AND meta_value NOT LIKE \'%FLAT%\'';
+                }
+                $results = $wpdb->get_results($exact_query);
+
+                // Now loop through alternatives
+                for($i=$start;$i<=$end;$i++){
+                    if($i!=$sku['value']){
+                        $alt_sku = sprintf($sku['base'], $i);
+                        if(preg_match('/FLAT$/', $alt_sku)){
+                            $alt_query = 'SELECT * FROM ' . $wpdb->prefix . 'postmeta WHERE meta_key = \'_sku\' AND meta_value LIKE \'' . strtoupper($alt_sku) . '%\'';
+                        } else {
+                            $alt_query = 'SELECT * FROM ' . $wpdb->prefix . 'postmeta WHERE meta_key = \'_sku\' AND meta_value LIKE \'' . strtoupper($alt_sku) . '%\' AND meta_value NOT LIKE \'%FLAT%\'';
+                        }
+                        $alt_results = $wpdb->get_results($alt_query);
+
+                        if(!empty($alt_results)){
+                            foreach($alt_results as $alt_result){
+                                $results[] = $alt_result;
+                            }
+                        }
+                    }
+                }
+            }
         }else{
             $results = true;
         }
 
 
-        if(!empty($results)){
-            if(is_array($results)){
+        if (!empty($results)) {
+            if (is_array($results)) {
                 foreach ($results as $result) {
                     $ids[] = $result->post_id;
                 }
@@ -411,29 +482,22 @@ class Fbf_Wheel_Search_Api
             ];
 
             $upsell_items = get_posts($args);
-            if($upsell_items){
+            if ($upsell_items) {
                 $items = [];
-                foreach($upsell_items as $upsell_item){
+                foreach ($upsell_items as $upsell_item) {
                     $product = wc_get_product($upsell_item->ID);
                     $product_stock = $product->get_stock_quantity();
-                    if($product_stock < 30){ //Allowed up to 30 apparently
+                    if ($product_stock < 30) { //Allowed up to 30 apparently
                         $max_packages = $product_stock;
-                    }else{
+                    } else {
                         $max_packages = 30;
                     }
                     $options = '';
-                    for($i=1;$i<=$max_packages;$i++){
-                        $options.= sprintf('<option value="%1$s" %2$s>%1$s</option>', $i, $i==1?'selected':'');
+                    for ($i = 1; $i <= $max_packages; $i++) {
+                        $options .= sprintf('<option value="%1$s" %2$s>%1$s</option>', $i, $i == 1 ? 'selected' : '');
                     }
                     $single_price = wc_get_price_including_tax($product);
                     $price = number_format((wc_get_price_including_tax($product)), 2);
-                    $price_exc = number_format(wc_get_price_excluding_tax($product), 2);
-                    if(!is_null($pc)&&$pc>0){
-                        $price+= ($price/100) * $pc;
-                        $price_exc+= ($price_exc/100) * $pc;
-                        $price = number_format($price, 2);
-                        $price_exc = number_format($price_exc, 2);
-                    }
                     $button = sprintf('<a href="/?add-multiple-to-cart=%1$s:1" data-quantity="1" class="button product_type_simple add_multiple_to_cart_button ajax_add_to_cart" data-product_id="%1$s" data-product_sku="%2$s" data-chassis-id="%4$s" rel="nofollow">Add to basket</a>', $product->get_id(), $product->get_sku(), $max_packages, $chassis);
 
                     //Category
@@ -456,7 +520,7 @@ class Fbf_Wheel_Search_Api
                     //Tax
                     $tax = '';
                     $rates = \WC_Tax::get_rates();
-                    if(!empty($rates)){
+                    if (!empty($rates)) {
                         $tax_types = array_column($rates, 'label');
                         $tax = 'inc. ' . join(',', $tax_types);
                     }
@@ -465,12 +529,10 @@ class Fbf_Wheel_Search_Api
                         'title' => $product->get_title(),
                         'url' => $product->get_permalink(),
                         'price' => $price,
-                        'price_exc' => $price_exc,
                         'single_price' => $single_price,
                         'currency' => get_woocommerce_currency_symbol(),
                         'sku' => $product->get_sku(),
-                        'image' => has_post_thumbnail($product->get_id())?wp_get_attachment_image_src(get_post_thumbnail_id($product->get_id()), 'fbf-300-x')[0]:wc_placeholder_img_src('fbf-300-x'),
-                        'image_lg' => has_post_thumbnail($product->get_id())?wp_get_attachment_image_src(get_post_thumbnail_id($product->get_id()), 'fbf-1200-x')[0]:wc_placeholder_img_src('fbf-1200-x'),
+                        'image' => has_post_thumbnail($product->get_id()) ? wp_get_attachment_image_src(get_post_thumbnail_id($product->get_id()), 'fbf-300-x')[0] : wc_placeholder_img_src('fbf-300-x'),
                         'button' => $button,
                         'options' => $options,
                         'stock' => $product->get_stock_quantity(),
@@ -490,11 +552,20 @@ class Fbf_Wheel_Search_Api
                     $items[] = $item;
                 }
                 return $items;
-            }else{
+            } else {
                 return false;
             }
-        }else{
+        } else {
             return false;
         }
+    }
+
+    private function get_meta($post_id, $key)
+    {
+        $val = get_post_meta($post_id, $key, true);
+        if($val){
+            return $val;
+        }
+        return false;
     }
 }
