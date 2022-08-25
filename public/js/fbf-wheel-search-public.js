@@ -230,7 +230,7 @@
 				let url = '/wheel-search-results/chassis/' + $chassis_select.val() + '/vehicle/' + encodeURIComponent($chasis_select.find(':selected').text()) + '/';
 				$button.unbind('click');
 				$button.bind('click', function(){
-					console.log('going to: ' + url);
+					window.location.href = url;
 					return false;
 				});
 			}else{
