@@ -33,14 +33,18 @@
 		window.populate_chasis = function ($chasis_select, manufacturer_id, is_packages_page, selected){
 			let is_landing_page = false;
 			let update_session = true;
+			let is_widget = false;
 			if($('body').hasClass('single-landing-pages')){
 				is_landing_page = true;
 			}
 			if($('body').hasClass('single-product')){
 				update_session = false;
 			}
+			if($chasis_select.hasClass('fbf-wheel-search-chassis-select-v2')){
+				is_widget = true;
+			}
 			$chasis_select.empty();
-			$chasis_select.append('<option>Please wait...</option>');
+			$chasis_select.append('<option value="">Please wait...</option>');
 			let data = {
 				action: 'fbf_wheel_search_get_chasis',
 				manufacturer_id: manufacturer_id,
@@ -98,7 +102,7 @@
 				},
 			});
 
-			if(!is_packages_page && !is_landing_page){
+			if(!is_packages_page && !is_landing_page && !is_widget){
 				$chasis_select.unbind('change');
 				$chasis_select.on('change', function(e){
 					let $manu;
@@ -175,7 +179,9 @@
 			}
 		};
 
-		let $manufacturer_select = $('#fbf-wheel-search-manufacturer-select, #fbf-package-search-manufacturer-select, #fbf-fitment-manufacturer-select');
+		let $manufacturer_select = $('#fbf-wheel-search-manufacturer-select, #fbf-package-search-manufacturer-select, #fbf-fitment-manufacturer-select, .fbf-wheel-search-manufacturer-select-v2');
+		console.log('manu select:');
+		console.log($manufacturer_select);
 		if(!$manufacturer_select.attr('data-init_id')){
 			$manufacturer_select.val($manufacturer_select.find('option:first').val());
 		}else{
@@ -191,16 +197,46 @@
 
 		$manufacturer_select.on('change', function(e) {
 			let id = $(this).attr('id');
-			//console.log('id:' + id);
+			let cl = 'fbf-wheel-search-manufacturer-select-v2';
+			console.log('id:' + id);
+			console.log('class:' + cl);
 			if(id==='fbf-wheel-search-manufacturer-select'){
 				$chasis_select = $('#fbf-wheel-search-chasis-select');
 			}else if(id==='fbf-package-search-manufacturer-select'){
 				$chasis_select = $('#fbf-package-search-chasis-select');
 			}else if(id==='fbf-fitment-manufacturer-select'){
 				$chasis_select = $('#fbf-fitment-chasis-select');
+			}else if($(this).hasClass(cl)){
+				$chasis_select = $('.fbf-wheel-search-chassis-select-v2');
 			}
 			window.populate_chasis($chasis_select, $(this).val(), is_packages_page, false);
 		});
+
+		// Size search fields
+		$('.wheel-search-widget-v2').find('input, select').bind('blur focus keyup change', function(){
+			console.log('wheel widget field');
+			wheel_widget_form_check($(this));
+		});
+
+		function wheel_widget_form_check($elem){
+			let $form = $elem.parents('.wheel-search-widget-v2');
+			let $button = $form.find('.wheel-search-widget-v2__button');
+			let $manu_select = $form.find('.fbf-wheel-search-manufacturer-select-v2');
+			let $chassis_select = $form.find('.fbf-wheel-search-chassis-select-v2');
+			let $postcode = $form.find('.fbf-wheel-search-postcode-v2');
+
+			if($manu_select.val()!==''&&$chassis_select.val()!==''&&$postcode.val()!==''){
+				$button.prop('disabled', false);
+				let url = '/wheel-search-results/chassis/' + $chassis_select.val() + '/vehicle/' + encodeURIComponent($chasis_select.find(':selected').text()) + '/';
+				$button.unbind('click');
+				$button.bind('click', function(){
+					console.log('going to: ' + url);
+					return false;
+				});
+			}else{
+				$button.prop('disabled', true);
+			}
+		}
 	});
 
 })( jQuery );
