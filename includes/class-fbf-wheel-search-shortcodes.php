@@ -51,4 +51,15 @@ HTML;
 
         return $html;
     }
+
+    public function accessory_search($atts)
+    {
+        $manu = Fbf_Wheel_Search_Public::manufacturers_dropdown_accessories();
+        $chassis = Fbf_Wheel_Search_Public::chasis_dropdown_accessories();
+        $html= '<form class="fbf-accessory-search">';
+        $html.= $manu;
+        $html.= $chassis;
+        $html.= '</form>';
+        return $html;
+    }
 }
