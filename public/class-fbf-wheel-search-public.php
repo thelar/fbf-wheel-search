@@ -190,7 +190,7 @@ class Fbf_Wheel_Search_Public {
         $manufacturers = $wpdb->get_results($sql);
         $html = '<div class="form-group col-12 col-lg-6 pr-lg-3">';
         $html.= sprintf('<label for="%s_%s">%s</label>', 'fbf-wheel-search-manufacturer-select', $id, 'Make');
-        $html.= sprintf('<select class="accessories-widget__form-field fbf-accessories-search-manufacturer-select mb-3" id="%s_%s">', 'fbf-accessories-search-manufacturer-select', $id);
+        $html.= sprintf('<select class="form-control accessories-widget__form-field fbf-accessories-search-manufacturer-select mb-3" id="%s_%s">', 'fbf-accessories-search-manufacturer-select', $id);
         $html.= sprintf('<option value="">Manufacturer</option>');
         if($manufacturers!==false){
             foreach($manufacturers as $manufacturer){
@@ -274,7 +274,7 @@ class Fbf_Wheel_Search_Public {
     {
         $html = '<div class="form-group col-12 col-lg-6 pl-lg-3">';
         $html.= sprintf('<label for="%s_%s">%s</label>', 'fbf-accessories-search-chasis-select', $id, 'Model');
-        $html.= sprintf('<select class="fbf-accessories-search-chassis-select accessories-widget__form-field mb-3" id="%s_%s">', 'fbf-accessories-search-select', $id);
+        $html.= sprintf('<select class="form-control fbf-accessories-search-chassis-select accessories-widget__form-field mb-3" id="%s_%s">', 'fbf-accessories-search-select', $id);
         $html.= sprintf('<option value="">Select Chassis</option>');
         $html.= '</select>';
         $html.= '</div>';
