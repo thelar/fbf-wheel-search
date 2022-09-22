@@ -272,7 +272,7 @@ class Fbf_Wheel_Search_Public {
 
     public static function chasis_dropdown_accessories($id=1)
     {
-        $html = '<div class="form-group col-12 col-lg-6 pl-lg-3">';
+        $html = '<div class="form-group">';
         $html.= sprintf('<label for="%s_%s">%s</label>', 'fbf-accessories-search-chasis-select', $id, 'Model');
         $html.= sprintf('<select class="form-control fbf-accessories-search-chassis-select accessories-widget__form-field mb-3" id="%s_%s">', 'fbf-accessories-search-select', $id);
         $html.= sprintf('<option value="">Select Chassis</option>');
