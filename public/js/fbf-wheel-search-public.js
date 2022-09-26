@@ -34,6 +34,7 @@
 			let is_landing_page = false;
 			let update_session = true;
 			let is_widget = false;
+			let is_accessories = false;
 			if($('body').hasClass('single-landing-pages')){
 				is_landing_page = true;
 			}
@@ -42,6 +43,9 @@
 			}
 			if($chasis_select.hasClass('fbf-wheel-search-chassis-select-v2')){
 				is_widget = true;
+			}
+			if($chasis_select.hasClass('fbf-accessories-search-chassis-select')){
+				is_accessories = true;
 			}
 			$chasis_select.empty();
 			$chasis_select.append('<option value="">Please wait...</option>');
@@ -102,7 +106,7 @@
 				},
 			});
 
-			if(!is_packages_page && !is_landing_page && !is_widget){
+			if(!is_packages_page && !is_landing_page && !is_widget && !is_accessories){
 				$chasis_select.unbind('change');
 				$chasis_select.on('change', function(e){
 					let $manu;
@@ -176,10 +180,23 @@
 
 					}
 				});
+			}else if(is_accessories){
+				$chasis_select.unbind('change');
+				$chasis_select.on('change', function(e){
+					console.log('accessories');
+					//console.log($manufacturer_select.val());
+					let url = '/accessories-search-results/chassis/' + $(this).val() + '/vehicle/' + encodeURIComponent($chasis_select.find(':selected').text()) + '/';
+					if(!$chasis_select.parents('.accessory-search-widget-v2').length){
+						window.location.href = url;
+					}else{
+						console.log('it is the widget');
+						console.log('make button go to: ' + url);
+					}
+				});
 			}
 		};
 
-		let $manufacturer_select = $('#fbf-wheel-search-manufacturer-select, #fbf-package-search-manufacturer-select, #fbf-fitment-manufacturer-select, .fbf-wheel-search-manufacturer-select-v2');
+		let $manufacturer_select = $('#fbf-wheel-search-manufacturer-select, #fbf-package-search-manufacturer-select, #fbf-fitment-manufacturer-select, .fbf-wheel-search-manufacturer-select-v2, .fbf-accessories-search-manufacturer-select');
 		console.log('manu select:');
 		console.log($manufacturer_select);
 		if(!$manufacturer_select.attr('data-init_id')){
@@ -198,6 +215,7 @@
 		$manufacturer_select.on('change', function(e) {
 			let id = $(this).attr('id');
 			let cl = 'fbf-wheel-search-manufacturer-select-v2';
+			let acl = 'fbf-accessories-search-manufacturer-select';
 			console.log('id:' + id);
 			console.log('class:' + cl);
 			if(id==='fbf-wheel-search-manufacturer-select'){
@@ -208,6 +226,8 @@
 				$chasis_select = $('#fbf-fitment-chasis-select');
 			}else if($(this).hasClass(cl)){
 				$chasis_select = $('.fbf-wheel-search-chassis-select-v2');
+			}else if($(this).hasClass(acl)){
+				$chasis_select = $('.fbf-accessories-search-chassis-select');
 			}
 			window.populate_chasis($chasis_select, $(this).val(), is_packages_page, false);
 		});
@@ -216,6 +236,12 @@
 		$('.wheel-search-widget-v2').find('input, select').bind('blur focus keyup change', function(){
 			console.log('wheel widget field');
 			wheel_widget_form_check($(this));
+		});
+
+		// Size search fields
+		$('.accessory-search-widget-v2').find('input, select').bind('blur focus keyup change', function(){
+			console.log('wheel widget field');
+			accessory_widget_form_check($(this));
 		});
 
 		function wheel_widget_form_check($elem){
@@ -228,6 +254,31 @@
 			if($manu_select.val()!==''&&$chassis_select.val()!==''&&$postcode.val()!==''){
 				$button.prop('disabled', false);
 				let url = '/wheel-search-results/chassis/' + $chassis_select.val() + '/vehicle/' + encodeURIComponent($chasis_select.find(':selected').text()) + '/';
+				$button.unbind('click');
+				$button.bind('click', function(){
+					window.location.href = url;
+					return false;
+				});
+			}else{
+				$button.prop('disabled', true);
+			}
+		}
+
+		function accessory_widget_form_check($elem){
+			console.log('accessory widget form check');
+			let $form = $elem.parents('.accessory-search-widget-v2');
+			let $button = $form.find('.accessory-search-widget-v2__button');
+			let $manu_select = $form.find('.fbf-accessories-search-manufacturer-select');
+			let $chassis_select = $form.find('.fbf-accessories-search-chassis-select');
+			let $postcode = $form.find('.fbf-accessory-search-postcode-v2');
+
+			console.log('postcode value:');
+			console.log($postcode.val());
+			console.log($button);
+
+			if($manu_select.val()!==''&&$chassis_select.val()!==''&&$postcode.val()!==''){
+				$button.prop('disabled', false);
+				let url = '/accessories-search-results/chassis/' + $chassis_select.val() + '/vehicle/' + encodeURIComponent($chasis_select.find(':selected').text()) + '/';
 				$button.unbind('click');
 				$button.bind('click', function(){
 					window.location.href = url;
