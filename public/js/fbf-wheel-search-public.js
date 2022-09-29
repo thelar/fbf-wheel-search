@@ -244,6 +244,22 @@
 			accessory_widget_form_check($(this));
 		});
 
+		let $wheel_search_form = $('.wheel-search-widget-v2__form');
+		$wheel_search_form.on('submit', function(){
+			console.log('wheel search form submit');
+			let $btn = $wheel_search_form.find('.wheel-search-widget-v2__button');
+			$btn.trigger('click');
+			return false;
+		});
+
+		let $accessory_search_form = $('.accessory-search-widget-v2__form');
+		$accessory_search_form.on('submit', function(){
+			console.log('accessory search form submit');
+			let $btn = $accessory_search_form.find('.accessory-search-widget-v2__button');
+			$btn.trigger('click');
+			return false;
+		});
+
 		function wheel_widget_form_check($elem){
 			let $form = $elem.parents('.wheel-search-widget-v2');
 			let $button = $form.find('.wheel-search-widget-v2__button');
@@ -257,7 +273,6 @@
 				$button.unbind('click');
 				$button.bind('click', function(){
 					window.location.href = url;
-					return false;
 				});
 			}else{
 				$button.prop('disabled', true);
