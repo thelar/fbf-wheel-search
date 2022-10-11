@@ -317,7 +317,7 @@
 					manufacturer_id: $manu_select.val(),
 					manufacturer: decodeURIComponent($manu_select.find(':selected').text()),
 					chassis_id: $chassis_select.val(),
-					chassis: decodeURIComponent($chasis_select.find(':selected').text()),
+					chassis: decodeURIComponent($chassis_select.find(':selected').text()),
 					postcode: $postcode.val(),
 					origin: origin,
 				};
