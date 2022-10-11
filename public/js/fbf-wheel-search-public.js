@@ -306,7 +306,6 @@
 		}
 
 		function mixpanel_track($elem, origin){
-			console.log('wheel search mixpanel track from ' + origin);
 			let event = 'wheel-search';
 			if(origin==='widget'){
 				let $form = $elem;
@@ -321,6 +320,7 @@
 					postcode: $postcode.val(),
 					origin: 'widget',
 				};
+				console.log('wheel search mixpanel track from ' + origin);
 				window.mixpanel_track(event, props);
 			}
 		}
