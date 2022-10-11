@@ -115,6 +115,7 @@
 						//console.log($manufacturer_select.val());
 						let url = '/wheel-search-results/chassis/' + $(this).val() + '/vehicle/' + encodeURIComponent($chasis_select.find(':selected').text()) + '/';
 						//console.log(url);
+						mixpanel_track(null, 'homepage');
 						window.location.href = url;
 					}else if($(this).attr('id')==='fbf-package-search-chasis-select'){
 						$manu = $('#fbf-package-search-manufacturer-select');
@@ -318,7 +319,19 @@
 					chassis_id: $chassis_select.val(),
 					chassis: decodeURIComponent($chasis_select.find(':selected').text()),
 					postcode: $postcode.val(),
-					origin: 'widget',
+					origin: origin,
+				};
+				console.log('wheel search mixpanel track from ' + origin);
+				window.mixpanel_track(event, props);
+			}else if(origin==='homepage'){
+				let $manu_select = $form.find('.fbf-wheel-search-manufacturer-select-v2');
+				let $chassis_select = $form.find('.fbf-wheel-search-chassis-select-v2');
+				let props = {
+					manufacturer_id: $manu_select.val(),
+					manufacturer: decodeURIComponent($manu_select.find(':selected').text()),
+					chassis_id: $chassis_select.val(),
+					chassis: decodeURIComponent($chasis_select.find(':selected').text()),
+					origin: origin,
 				};
 				console.log('wheel search mixpanel track from ' + origin);
 				window.mixpanel_track(event, props);
