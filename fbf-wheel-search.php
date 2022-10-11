@@ -30,12 +30,12 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-/**
+/**˚
  * Currently plugin version.
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define( 'FBF_WHEEL_SEARCH_VERSION', '1.0.38' );
+define( 'FBF_WHEEL_SEARCH_VERSION', '1.0.39' );
 
 /**
  * Current database version.
