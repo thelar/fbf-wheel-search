@@ -325,8 +325,8 @@
 				window.mixpanel_track(event, props);
 			}else if(origin==='homepage'){
 				let $form = $elem;
-				let $manu_select = $form.find('.fbf-wheel-search-manufacturer-select-v2');
-				let $chassis_select = $form.find('.fbf-wheel-search-chassis-select-v2');
+				let $manu_select = $form.find('#fbf-wheel-search-manufacturer-select');
+				let $chassis_select = $form.find('#fbf-wheel-search-chasis-select');
 				let props = {
 					manufacturer_id: $manu_select.val(),
 					manufacturer: decodeURIComponent($manu_select.find(':selected').text()),
