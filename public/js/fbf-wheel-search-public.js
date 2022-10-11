@@ -248,7 +248,7 @@
 		$wheel_search_form.on('submit', function(){
 			console.log('wheel search form submit');
 			let $btn = $wheel_search_form.find('.wheel-search-widget-v2__button');
-			mixpanel_track('widget');
+			mixpanel_track($(this), 'widget');
 			$btn.trigger('click');
 			return false;
 		});
@@ -305,8 +305,24 @@
 			}
 		}
 
-		function mixpanel_track(origin){
+		function mixpanel_track($elem, origin){
 			console.log('wheel search mixpanel track from ' + origin);
+			let event = 'wheel-search';
+			if(origin==='widget'){
+				let $form = $elem;
+				let $manu_select = $form.find('.fbf-wheel-search-manufacturer-select-v2');
+				let $chassis_select = $form.find('.fbf-wheel-search-chassis-select-v2');
+				let $postcode = $form.find('.fbf-wheel-search-postcode-v2');
+				let props = {
+					manufacturer_id: $manu_select.val(),
+					manufacturer: encodeURIComponent($manu_select.find(':selected').text()),
+					chassis_id: $chassis_select.val(),
+					chassis: encodeURIComponent($chasis_select.find(':selected').text()),
+					postcode: $postcode.val(),
+					origin: 'widget',
+				};
+				window.mixpanel_track(event, props);
+			}
 		}
 	});
 
