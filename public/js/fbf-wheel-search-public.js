@@ -272,6 +272,7 @@
 				let url = '/wheel-search-results/chassis/' + $chassis_select.val() + '/vehicle/' + encodeURIComponent($chasis_select.find(':selected').text()) + '/';
 				$button.unbind('click');
 				$button.bind('click', function(){
+					console.log('wheel search from widget');
 					let event = 'wheel-search';
 					let props = {
 						manufacturer_id: $manu_select.val(),
