@@ -334,7 +334,9 @@
 					chassis: decodeURIComponent($chasis_select.find(':selected').text()),
 					origin: origin,
 				};
+
 				console.log('wheel search mixpanel track from ' + origin);
+				console.log(props);
 				window.mixpanel_track(event, props);
 			}
 		}
