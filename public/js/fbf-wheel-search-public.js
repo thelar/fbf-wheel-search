@@ -314,9 +314,9 @@
 				let $postcode = $form.find('.fbf-wheel-search-postcode-v2');
 				let props = {
 					manufacturer_id: $manu_select.val(),
-					manufacturer: $manu_select.find(':selected').text(),
+					manufacturer: decodeURIComponent($manu_select.find(':selected').text()),
 					chassis_id: $chassis_select.val(),
-					chassis: $chasis_select.find(':selected').text(),
+					chassis: decodeURIComponent($chasis_select.find(':selected').text()),
 					postcode: $postcode.val(),
 					origin: 'widget',
 				};
