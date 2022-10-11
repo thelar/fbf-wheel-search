@@ -272,6 +272,16 @@
 				let url = '/wheel-search-results/chassis/' + $chassis_select.val() + '/vehicle/' + encodeURIComponent($chasis_select.find(':selected').text()) + '/';
 				$button.unbind('click');
 				$button.bind('click', function(){
+					let event = 'wheel-search';
+					let props = {
+						manufacturer_id: $manu_select.val(),
+						manufacturer: encodeURIComponent($manu_select.find(':selected').text()),
+						chassis_id: $chassis_select.val(),
+						chassis: encodeURIComponent($chasis_select.find(':selected').text()),
+						postcode: $postcode.val(),
+						origin: 'widget',
+					};
+					window.mixpanel_track(event, props);
 					window.location.href = url;
 				});
 			}else{
