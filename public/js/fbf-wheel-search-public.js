@@ -248,6 +248,7 @@
 		$wheel_search_form.on('submit', function(){
 			console.log('wheel search form submit');
 			let $btn = $wheel_search_form.find('.wheel-search-widget-v2__button');
+			mixpanel_track('widget');
 			$btn.trigger('click');
 			return false;
 		});
@@ -272,17 +273,6 @@
 				let url = '/wheel-search-results/chassis/' + $chassis_select.val() + '/vehicle/' + encodeURIComponent($chasis_select.find(':selected').text()) + '/';
 				$button.unbind('click');
 				$button.bind('click', function(){
-					console.log('wheel search from widget');
-					let event = 'wheel-search';
-					let props = {
-						manufacturer_id: $manu_select.val(),
-						manufacturer: encodeURIComponent($manu_select.find(':selected').text()),
-						chassis_id: $chassis_select.val(),
-						chassis: encodeURIComponent($chasis_select.find(':selected').text()),
-						postcode: $postcode.val(),
-						origin: 'widget',
-					};
-					window.mixpanel_track(event, props);
 					window.location.href = url;
 				});
 			}else{
@@ -313,6 +303,10 @@
 			}else{
 				$button.prop('disabled', true);
 			}
+		}
+
+		function mixpanel_track(origin){
+			console.log('wheel search mixpanel track from ' + origin);
 		}
 	});
 
