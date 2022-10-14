@@ -15,10 +15,15 @@ class Fbf_Wheel_Search_Shortcodes
     {
         $manu = Fbf_Wheel_Search_Public::manufacturers_dropdown_v2($atts['id']);
         $chassis = Fbf_Wheel_Search_Public::chasis_dropdown_v2($atts['id']);
+        if(!empty($atts['bg-image'])){
+            $bg_style = sprintf('style="background-image: url(\'%s\');"', $atts['bg-image']);
+        }else{
+            $bg_style = '';
+        }
         $html = <<<HTML
 <div id="wheel-search-widget-v2_{$atts['id']}" class="wheel-search-widget-v2">
     <h3 class="wheel-search-widget-v2__title d-lg-none">Search by vehicle</h3>
-    <div class="wheel-search-widget-v2__content">
+    <div class="wheel-search-widget-v2__content" {$bg_style}>
         <h3 class="wheel-search-widget-v2__heading d-none d-lg-block mt-2 mb-4" aria-hidden="true">Search by vehicle</h3>
         <form id="wheel-search-widget-v2--{$atts['id']}" class="wheel-search-widget-v2__form" action="post">
             <div class="wheel-search-widget-v2__row row no-gutters">
@@ -69,10 +74,15 @@ HTML;
     {
         $manu = Fbf_Wheel_Search_Public::manufacturers_dropdown_accessories_v2($atts['id']);
         $chassis = Fbf_Wheel_Search_Public::chasis_dropdown_accessories_v2($atts['id']);
+        if(!empty($atts['bg-image'])){
+            $bg_style = sprintf('style="background-image: url(\'%s\');"', $atts['bg-image']);
+        }else{
+            $bg_style = '';
+        }
         $html = <<<HTML
 <div id="accessory-search-widget-v2_{$atts['id']}" class="accessory-search-widget-v2">
     <h3 class="accessory-search-widget-v2__title d-lg-none">Search by vehicle</h3>
-    <div class="accessory-search-widget-v2__content">
+    <div class="accessory-search-widget-v2__content" {$bg_style}>
         <h3 class="accessory-search-widget-v2__heading d-none d-lg-block mt-2 mb-4" aria-hidden="true">Search by vehicle</h3>
         <form id="accessory-search-widget-v2--{$atts['id']}" class="accessory-search-widget-v2__form" action="post">
             <div class="accessory-search-widget-v2__row row no-gutters">
