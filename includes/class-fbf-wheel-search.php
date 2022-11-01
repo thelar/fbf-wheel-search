@@ -174,6 +174,8 @@ class Fbf_Wheel_Search {
         $this->loader->add_action( 'wp_ajax_nopriv_fbf_wheel_search_get_chasis', $plugin_public, 'fbf_wheel_search_get_chasis' );
         $this->loader->add_action( 'wp_ajax_fbf_wheel_fitment', $plugin_public, 'fbf_wheel_fitment' );
         $this->loader->add_action( 'wp_ajax_nopriv_fbf_wheel_fitment', $plugin_public, 'fbf_wheel_fitment' );
+        $this->loader->add_action( 'wp_ajax_fbf_postcode_check', $plugin_public, 'fbf_postcode_check' );
+        $this->loader->add_action( 'wp_ajax_nopriv_fbf_postcode_check', $plugin_public, 'fbf_postcode_check' );
 
         //Shortcodes
         $this->loader->add_shortcode('fbf_wheel_search_widget', $plugin_public, 'wheel_search_widget');

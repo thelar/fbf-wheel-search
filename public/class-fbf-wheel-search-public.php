@@ -355,6 +355,27 @@ class Fbf_Wheel_Search_Public {
         die();
 	}
 
+    public function fbf_postcode_check()
+    {
+        check_ajax_referer($this->option_name, 'ajax_nonce');
+        $resp = [];
+        $resp['status'] = 'success';
+
+        $country = $this->fbf_wheel_search_country();
+        $postcode = filter_var($_POST['postcode'], FILTER_SANITIZE_STRING);
+
+        if(WC_Validation::is_postcode($postcode, $country)){
+            $resp['status'] = 'success';
+            WC()->session->set('customer_postcode', $postcode);
+        }else{
+            $resp['status']  = 'error';
+            $resp['error'] = 'Invalid postcode';
+        }
+
+        echo json_encode($resp);
+        die();
+    }
+
     public static function chasis_dropdown_landing($brand_term_id)
     {
         $html = sprintf('<select class="form-control mb-0" id="%s" data-brand="%s">', 'fbf-package-search-chasis-select', $brand_term_id);
@@ -436,4 +457,21 @@ class Fbf_Wheel_Search_Public {
         $vars[] = "vehicle";
         return $vars;
     }*/
+
+    public function fbf_wheel_search_country()
+    {
+        //Country
+        //see if there's a billing country
+        if(!is_null(WC()->customer)){
+            $country = WC()->customer->get_billing_country();
+        }
+        if(!$country){
+            //Geolocate
+            $geo = new \WC_Geolocation();
+            $user_ip  = $geo->get_ip_address(); // Get user IP
+            $user_geo = $geo->geolocate_ip( $user_ip ); // Get geolocated user data.
+            $country  = $user_geo['country']; // Get the country code
+        }
+        return $country;
+    }
 }

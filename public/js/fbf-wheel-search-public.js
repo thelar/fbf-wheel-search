@@ -274,7 +274,31 @@
 				let url = '/wheel-search-results/chassis/' + $chassis_select.val() + '/vehicle/' + encodeURIComponent($chasis_select.find(':selected').text()) + '/';
 				$button.unbind('click');
 				$button.bind('click', function(){
-					window.location.href = url;
+					console.log('wheel widget button click');
+					$button.addClass('loading');
+					//window.location.href = url;
+
+					let data = {
+						action: 'fbf_postcode_check',
+						ajax_nonce: fbf_wheel_search_ajax_object.ajax_nonce,
+						postcode: $postcode.val(),
+					}
+					$.ajax({
+						url: fbf_wheel_search_ajax_object.ajax_url,
+						type: 'POST',
+						data: data,
+						dataType: 'json',
+						success: function (response) {
+							$button.removeClass('loading');
+							if(response.status==='success'){
+								window.location.href = url; // Direct to wheel product ladder
+							}else if(response.status==='error'){
+								alert('An error occurred: ' + response.error);
+							}
+						},
+					});
+
+					return false;
 				});
 			}else{
 				$button.prop('disabled', true);
