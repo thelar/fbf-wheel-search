@@ -249,7 +249,6 @@
 		$wheel_search_form.on('submit', function(){
 			console.log('wheel search form submit');
 			let $btn = $wheel_search_form.find('.wheel-search-widget-v2__button');
-			mixpanel_track($(this), 'widget');
 			$btn.trigger('click');
 			return false;
 		});
@@ -291,6 +290,7 @@
 						success: function (response) {
 							$button.removeClass('loading');
 							if(response.status==='success'){
+								mixpanel_track($form, 'widget');
 								window.location.href = url; // Direct to wheel product ladder
 							}else if(response.status==='error'){
 								alert('An error occurred: ' + response.error);
