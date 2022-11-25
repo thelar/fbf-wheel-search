@@ -115,8 +115,9 @@
 						//console.log($manufacturer_select.val());
 						let url = '/wheel-search-results/chassis/' + $(this).val() + '/vehicle/' + encodeURIComponent($chasis_select.find(':selected').text()) + '/';
 						//console.log(url);
-						mixpanel_track($chasis_select.parents('.homepage__box__content'), 'homepage');
-						window.location.href = url;
+						let cb = function(){window.location.href = url;}
+						mixpanel_track($chasis_select.parents('.homepage__box__content'), 'homepage', cb);
+
 					}else if($(this).attr('id')==='fbf-package-search-chasis-select'){
 						$manu = $('#fbf-package-search-manufacturer-select');
 						let url = '/tyre-wheel-packages/chassis/' + $(this).val() + '/vehicle/' + $manu.val() + '/name/' + encodeURIComponent($chasis_select.find(':selected').text()) + '/';
@@ -290,8 +291,8 @@
 						success: function (response) {
 							$button.removeClass('loading');
 							if(response.status==='success'){
-								mixpanel_track($form, 'widget');
-								window.location.href = url; // Direct to wheel product ladder
+								let cb = function(){window.location.href = url;}
+								mixpanel_track($form, 'widget', cb);
 							}else if(response.status==='error'){
 								alert('An error occurred: ' + response.error);
 							}
@@ -329,7 +330,7 @@
 			}
 		}
 
-		function mixpanel_track($elem, origin){
+		function mixpanel_track($elem, origin, cb){
 			let event = 'wheel-search';
 			if(origin==='widget'){
 				let $form = $elem;
@@ -345,7 +346,7 @@
 					origin: origin,
 				};
 				console.log('wheel search mixpanel track from ' + origin);
-				window.mixpanel_track(event, props);
+				window.mixpanel_track(event, props, cb);
 			}else if(origin==='homepage'){
 				let $form = $elem;
 				let $manu_select = $form.find('#fbf-wheel-search-manufacturer-select');
@@ -360,7 +361,7 @@
 
 				console.log('wheel search mixpanel track from ' + origin);
 				console.log(props);
-				window.mixpanel_track(event, props);
+				window.mixpanel_track(event, props, cb);
 			}
 		}
 	});
