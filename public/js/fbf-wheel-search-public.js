@@ -66,7 +66,7 @@
 						if(is_landing_page){
 							option = '<option value="">Select Model</option>';
 						}else{
-							option = '<option value="">Select chassis</option>';
+							option = '<option value="">Select Model</option>';
 						}
 
 						$.each(response.data, function(i, e){
