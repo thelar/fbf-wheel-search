@@ -175,8 +175,7 @@ class Fbf_Wheel_Search_Public {
         $table = $wpdb->prefix . 'fbf_vehicle_manufacturers';
         $sql = "SELECT * FROM $table WHERE enabled = 1 ORDER BY display_name";
         $manufacturers = $wpdb->get_results($sql);
-        $html = '<div class="form-group col-12 col-lg-6 pr-lg-3">';
-        $html.= sprintf('<label for="%s_%s">%s</label>', 'fbf-wheel-search-manufacturer-select', $id, 'Make');
+        $html = '<div class="fbf-form-group form-group col-12 col-lg-6 pr-lg-3 mb-0">';
         $html.= sprintf('<select class="wheel-widget-v2__form-field fbf-wheel-search-manufacturer-select-v2 mb-3" id="%s_%s">', 'fbf-wheel-search-manufacturer-select', $id);
         $html.= sprintf('<option value="">Manufacturer</option>');
         if($manufacturers!==false){
@@ -185,6 +184,7 @@ class Fbf_Wheel_Search_Public {
             }
         }
         $html.= '</select>';
+        $html.= sprintf('<label for="%s_%s" class="control-label"><span class="floating-label">%s</span></label>', 'fbf-wheel-search-manufacturer-select', $id, 'Make');
         $html.= '</div>';
         return $html;
 	}
@@ -215,7 +215,7 @@ class Fbf_Wheel_Search_Public {
         $table = $wpdb->prefix . 'fbf_vehicle_manufacturers';
         $sql = "SELECT * FROM $table WHERE enabled = 1 ORDER BY display_name";
         $manufacturers = $wpdb->get_results($sql);
-        $html = '<div class="fbf-form-group form-group col-12 col-lg-6 pr-lg-3">';
+        $html = '<div class="fbf-form-group form-group col-12 col-lg-6 pr-lg-3 mb-0">';
         $html.= sprintf('<select class="accessories-widget__form-field fbf-accessories-search-manufacturer-select mb-3" id="%s_%s">', 'fbf-accessories-search-manufacturer-select', $id);
         $html.= sprintf('<option value="">Manufacturer</option>');
         if($manufacturers!==false){
@@ -288,11 +288,11 @@ class Fbf_Wheel_Search_Public {
 
     public static function chasis_dropdown_v2($id)
     {
-        $html = '<div class="form-group col-12 col-lg-6 pl-lg-3">';
-        $html.= sprintf('<label for="%s_%s">%s</label>', 'fbf-wheel-search-chasis-select', $id, 'Model');
+        $html = '<div class="fbf-form-group form-group right col-12 col-lg-6 mb-0">';
         $html.= sprintf('<select class="fbf-wheel-search-chassis-select-v2 wheel-widget-v2__form-field mb-3" id="%s_%s">', 'fbf-wheel-search-chasis-select', $id);
         $html.= sprintf('<option value="">Select model</option>');
         $html.= '</select>';
+        $html.= sprintf('<label for="%s_%s" class="control-label"><span class="floating-label">%s</span></label>', 'fbf-wheel-search-chasis-select', $id, 'Model');
         $html.= '</div>';
         return $html;
 	}
@@ -310,7 +310,7 @@ class Fbf_Wheel_Search_Public {
 
     public static function chasis_dropdown_accessories_v2($id=1)
     {
-        $html = '<div class="fbf-form-group form-group col-12 col-lg-6 pl-lg-3">';
+        $html = '<div class="fbf-form-group form-group right col-12 col-lg-6 mb-0">';
         $html.= sprintf('<select class="fbf-accessories-search-chassis-select accessories-widget__form-field mb-3" id="%s_%s">', 'fbf-accessories-search-select', $id);
         $html.= sprintf('<option value="">Select model</option>');
         $html.= '</select>';

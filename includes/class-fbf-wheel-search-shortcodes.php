@@ -31,11 +31,11 @@ class Fbf_Wheel_Search_Shortcodes
                 {$chassis}
             </div>
             <div class="wheel-search-widget-v2__row row no-gutters">
-                <div class="form-group col-12 col-lg-3 pr-lg-3">
-                    <label for="fbf-wheel-search-postcode_{$atts['id']}">Postcode</label>
+                <div class="fbf-form-group form-group col-12 col-lg-3 pr-lg-3">
                     <input type="text" id="fbf-wheel-search-postcode_{$atts['id']}" name="fbf-wheel-search-postcode" class="wheel-widget-v2__form-field fbf-wheel-search-postcode-v2 mb-2 mb-lg-0"/>
+                    <label for="fbf-wheel-search-postcode_{$atts['id']}" class="control-label"><span class="floating-label">Postcode</span></label>
                 </div>
-                <div class="form-group col-12 col-lg-3 pl-lg-3 pr-lg-3 d-lg-flex flex-lg-column justify-content-lg-end">
+                <div class="form-group col-12 col-lg-3 pl-lg-3 pr-lg-3 d-lg-flex flex-lg-column justify-content-lg-start">
                     <button id="tyre-reg-search--reg-button_{$atts['id']}" class="wheel-search-widget-v2__button" type="submit" rel="nofollow" role="button" disabled>
                         See products
                         <span class="icon">
@@ -90,11 +90,11 @@ HTML;
                 {$chassis}
             </div>
             <div class="accessory-search-widget-v2__row row no-gutters">
-                <div class="form-group col-12 col-lg-3 pr-lg-3">
-                    <label for="fbf-accessory-search-postcode_{$atts['id']}">Postcode</label>
+                <div class="fbf-form-group form-group col-12 col-lg-3 pr-lg-3">
                     <input type="text" id="fbf-accessory-search-postcode_{$atts['id']}" name="fbf-accessory-search-postcode" class="accessory-widget-v2__form-field fbf-accessory-search-postcode-v2 mb-2 mb-lg-0"/>
+                    <label for="fbf-accessory-search-postcode_{$atts['id']}" class="control-label"><span class="floating-label">Postcode</span></label>
                 </div>
-                <div class="form-group col-12 col-lg-3 pl-lg-3 pr-lg-3 d-lg-flex flex-lg-column justify-content-lg-end">
+                <div class="form-group col-12 col-lg-3 pl-lg-3 pr-lg-3 d-lg-flex flex-lg-column justify-content-lg-start">
                     <button id="tyre-reg-search--reg-button_{$atts['id']}" class="accessory-search-widget-v2__button" type="button" rel="nofollow" role="submit" disabled>
                         See products
                         <span class="icon">
