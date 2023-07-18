@@ -361,7 +361,10 @@ class Fbf_Wheel_Search_Public {
         $resp = [];
         $resp['status'] = 'success';
 
-        $country = $this->fbf_wheel_search_country();
+        //$country = $this->country();
+        // Default country to GB until we find a better solution
+        $country = 'GB';
+
         $postcode = filter_var($_POST['postcode'], FILTER_SANITIZE_STRING);
 
         if(WC_Validation::is_postcode($postcode, $country)){
