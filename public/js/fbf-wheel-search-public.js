@@ -279,8 +279,7 @@
 					//window.location.href = url;
 
 					let data = {
-						action: 'fbf_postcode_check',
-						ajax_nonce: fbf_wheel_search_ajax_object.ajax_nonce,
+						action: 'postcode_check',
 						postcode: $postcode.val(),
 					}
 					$.ajax({
