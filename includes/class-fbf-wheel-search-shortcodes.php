@@ -51,6 +51,73 @@ HTML;
         return $html;
     }
 
+    public function wheel_search_v3($attrs)
+    {
+        if(!is_array($attrs)){
+            $id = '';
+        }else{
+            if(isset($attrs['id'])){
+                $id = $attrs['id'];
+            }else{
+                $id = '1';
+            }
+        }
+        $manu = Fbf_Wheel_Search_Public::manufacturers_dropdown_v3($id);
+        $chassis = Fbf_Wheel_Search_Public::chasis_dropdown_v3($id);
+
+        if(is_plugin_active('litespeed-cache/litespeed-cache.php')){
+            $size_postcode_field = apply_filters('litespeed_esi_url', 'esi_postcode_form_block', 'Postcode form block', ['id' => $id, 'type' => 'size']);
+            $reg_postcode_field = apply_filters('litespeed_esi_url', 'esi_postcode_form_block', 'Postcode form block', ['id' => $id, 'type' => 'reg']);
+        }else{
+            $postcode_field = sprintf('<input id="sc-fbf-wheel-search--postcode_%s" type="text" class="fbf-wheel-search-postcode-v2 sc-fbf-wheel-search__form-field postcode" data-search_postcode="%s" disabled />', $id, WC()->session->get('search_postcode'));
+        }
+
+        $html = <<<HTML
+<div id="sc-fbf-wheel-search_{$id}" class="sc-fbf-wheel-search">
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item flex-grow-1 d-flex">
+            <a class="nav-link flex-grow-1 active" id="sc-fbf-wheel-search__vehicle-tab" data-toggle="tab" href="#sc-fbf-wheel-search--vehicle" role="tab" aria-controls="sc-fbf-wheel-search--vehicle" aria-selected="true">Search by vehicle</a>
+        </li>
+    </ul>
+    <div class="tab-content" id="myTabContent">
+        <div class="sc-fbf-wheel-search__tab-pane tab-pane fade show active" id="sc-fbf-wheel-search--vehicle" role="tabpanel" aria-labelledby="sc-fbf-wheel-search__vehicle-tab">
+            
+            <form id="sc-fbf-wheel-search__form-{$id}" class="sc-fbf-wheel-search__form" action="post">
+                {$manu}
+                {$chassis}
+                <div class="fbf-form-group sc-fbf-wheel-search__form--row">
+                    <select id="sc-fbf-wheel-search--size-fitting_{$id}" class="sc-fbf-wheel-search__form-field fitting" disabled>
+                        <option value="">Fitted or delivered?</option>
+                        <option value="fitted">Fitted</option>
+                        <option value="delivered">Delivered</option>
+                    </select>
+                    <label for="sc-fbf-wheel-search--size-fitting_{$id}" class="control-label">
+                        <span class="floating-label">Fitted or delivered?</span>
+                    </label>
+                </div>
+                <div class="fbf-form-group sc-fbf-wheel-search__form--row">
+                    {$postcode_field}
+                    <label for="sc-fbf-wheel-search--postcode_{$id}" class="control-label">
+                        <span class="floating-label">Postcode</span>
+                    </label>
+                </div>
+                <div class="sc-fbf-wheel-search__form--row">
+                    <button id="sc-fbf-wheel-search--size-button_{$id}" class="sc-fbf-wheel-search__button size" type="submit" rel="nofollow" role="button" disabled>
+                        See products
+                        <span class="icon">
+                            <i class="fa fa-spinner fa-pulse"></i>
+                        </span>
+                    </button>
+                </div>
+            </form>
+            
+        </div>
+    </div>
+</div>
+HTML;
+        return $html;
+    }
+
     public function package_search($atts)
     {
         $html= Fbf_Wheel_Search_Public::manufacturers_dropdown_package();

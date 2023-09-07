@@ -128,6 +128,13 @@ class Fbf_Wheel_Search_Public {
         echo $sc->wheel_search_v2($atts);
 	}
 
+    public function wheel_search_widget_v3($atts)
+    {
+        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-fbf-wheel-search-shortcodes.php';
+        $sc = new Fbf_Wheel_Search_Shortcodes();
+        echo $sc->wheel_search_v3($atts);
+	}
+
     public function package_search_widget($atts)
     {
         require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-fbf-wheel-search-shortcodes.php';
@@ -176,6 +183,26 @@ class Fbf_Wheel_Search_Public {
         $sql = "SELECT * FROM $table WHERE enabled = 1 ORDER BY display_name";
         $manufacturers = $wpdb->get_results($sql);
         $html = '<div class="fbf-form-group form-group col-12 col-lg-6 pr-lg-3 mb-0">';
+        $html.= sprintf('<select class="wheel-widget-v2__form-field fbf-wheel-search-manufacturer-select-v2 mb-3" id="%s_%s">', 'fbf-wheel-search-manufacturer-select', $id);
+        $html.= sprintf('<option value="">Manufacturer</option>');
+        if($manufacturers!==false){
+            foreach($manufacturers as $manufacturer){
+                $html.= sprintf('<option value="%s">%s</option>', $manufacturer->boughto_id, $manufacturer->display_name);
+            }
+        }
+        $html.= '</select>';
+        $html.= sprintf('<label for="%s_%s" class="control-label"><span class="floating-label">%s</span></label>', 'fbf-wheel-search-manufacturer-select', $id, 'Make');
+        $html.= '</div>';
+        return $html;
+	}
+
+    public static function manufacturers_dropdown_v3($id)
+    {
+        global $wpdb;
+        $table = $wpdb->prefix . 'fbf_vehicle_manufacturers';
+        $sql = "SELECT * FROM $table WHERE enabled = 1 ORDER BY display_name";
+        $manufacturers = $wpdb->get_results($sql);
+        $html = '<div class="fbf-form-group sc-fbf-reg-tyre-search__form--row">';
         $html.= sprintf('<select class="wheel-widget-v2__form-field fbf-wheel-search-manufacturer-select-v2 mb-3" id="%s_%s">', 'fbf-wheel-search-manufacturer-select', $id);
         $html.= sprintf('<option value="">Manufacturer</option>');
         if($manufacturers!==false){
@@ -291,6 +318,16 @@ class Fbf_Wheel_Search_Public {
         $html = '<div class="fbf-form-group form-group right col-12 col-lg-6 mb-0">';
         $html.= sprintf('<select class="fbf-wheel-search-chassis-select-v2 wheel-widget-v2__form-field mb-3" id="%s_%s">', 'fbf-wheel-search-chasis-select', $id);
         $html.= sprintf('<option value="">Select model</option>');
+        $html.= '</select>';
+        $html.= sprintf('<label for="%s_%s" class="control-label"><span class="floating-label">%s</span></label>', 'fbf-wheel-search-chasis-select', $id, 'Model');
+        $html.= '</div>';
+        return $html;
+	}
+
+    public static function chasis_dropdown_v3($id)
+    {
+        $html = '<div class="fbf-form-group sc-fbf-reg-tyre-search__form--row">';
+        $html.= sprintf('<select class="fbf-wheel-search-chassis-select-v2 wheel-widget-v2__form-field mb-3" id="%s_%s" disabled>', 'fbf-wheel-search-chasis-select', $id);
         $html.= '</select>';
         $html.= sprintf('<label for="%s_%s" class="control-label"><span class="floating-label">%s</span></label>', 'fbf-wheel-search-chasis-select', $id, 'Model');
         $html.= '</div>';

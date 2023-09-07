@@ -62,6 +62,7 @@
 				dataType: 'json',
 				success: function(response){
 					if(response.status==='success'){
+						$chasis_select.attr('disabled', false);
 						let option;
 						if(is_landing_page){
 							option = '<option value="">Select Model</option>';
@@ -195,6 +196,38 @@
 						console.log('make button go to: ' + url);
 					}
 				});
+			}else if(is_widget){
+				$chasis_select.unbind('change');
+				let $fitting = $('.sc-fbf-wheel-search__form-field.fitting');
+				let $postcode = $('.sc-fbf-wheel-search__form-field.postcode');
+
+				$fitting.attr('disabled', true);
+				$fitting.val('');
+				$fitting.removeClass('has-value');
+
+				$postcode.attr('disabled', true);
+				$postcode.removeClass('has-value');
+				$postcode.val('');
+
+				$fitting.unbind('change');
+				$chasis_select.on('change', function(e){
+					console.log('chassis select change here - widget');
+					$fitting.attr('disabled', false);
+					$fitting.addClass('has-value');
+					$fitting.val('');
+
+					$postcode.attr('disabled', true);
+					$postcode.removeClass('has-value');
+					$postcode.val('');
+
+					$fitting.on('change', function(){
+						if($(this).val().length > 0){
+							$postcode.attr('disabled', false);
+							$postcode.addClass('has-value');
+							$postcode.val($postcode.attr('data-search_postcode'));
+						}
+					});
+				});
 			}
 		};
 
@@ -231,6 +264,8 @@
 			}else if($(this).hasClass(acl)){
 				$chasis_select = $('.fbf-accessories-search-chassis-select');
 			}
+
+			$chasis_select.addClass('has-value');
 			window.populate_chasis($chasis_select, $(this).val(), is_packages_page, false);
 		});
 
@@ -238,6 +273,10 @@
 		$('.wheel-search-widget-v2').find('input, select').bind('blur focus keyup change', function(){
 			console.log('wheel widget field');
 			wheel_widget_form_check($(this));
+		});
+		$('.sc-fbf-wheel-search__form').find('input, select').bind('blur focus keyup change', function(){
+			console.log('sc wheel widget field');
+			sc_wheel_widget_form_check($(this));
 		});
 
 		// Size search fields
@@ -263,6 +302,7 @@
 		});
 
 		function wheel_widget_form_check($elem){
+			console.log('wheel widget form check');
 			let $form = $elem.parents('.wheel-search-widget-v2');
 			let $button = $form.find('.wheel-search-widget-v2__button');
 			let $manu_select = $form.find('.fbf-wheel-search-manufacturer-select-v2');
@@ -288,6 +328,51 @@
 						data: data,
 						dataType: 'json',
 						success: function (response) {
+							$button.removeClass('loading');
+							if(response.status==='success'){
+								let cb = function(){window.location.href = url;}
+								mixpanel_track($form, 'widget', cb);
+							}else if(response.status==='error'){
+								alert('An error occurred: ' + response.error);
+							}
+						},
+					});
+					return false;
+				});
+			}else{
+				$button.prop('disabled', true);
+			}
+		}
+
+		function sc_wheel_widget_form_check($elem){
+			let $form = $elem.parents('.sc-fbf-wheel-search__form');
+			let $button = $form.find('.sc-fbf-wheel-search__button');
+			let $manu_select = $form.find('.fbf-wheel-search-manufacturer-select-v2');
+			let $chassis_select = $form.find('.fbf-wheel-search-chassis-select-v2');
+			let $fitting_select = $form.find('sc-fbf-wheel-search__form-field.fitting');
+			let $postcode = $form.find('.sc-fbf-wheel-search__form-field.postcode');
+
+			if($manu_select.val()!==''&&$chassis_select.val()!==''&&$fitting_select.val()!==''&&$postcode.val()!==''){
+				$button.prop('disabled', false);
+				let url = '/wheel-search-results/chassis/' + $chassis_select.val() + '/vehicle/' + encodeURIComponent($chasis_select.find(':selected').text()) + '/';
+				$button.unbind('click');
+				$button.bind('click', function(){
+					console.log('wheel widget button click');
+					$button.addClass('loading');
+					//window.location.href = url;
+
+					let data = {
+						action: 'postcode_check',
+						postcode: $postcode.val(),
+					}
+					$.ajax({
+						url: fbf_wheel_search_ajax_object.ajax_url,
+						type: 'POST',
+						data: data,
+						dataType: 'json',
+						success: function (response) {
+							console.log(url);
+							console.log(response);
 							$button.removeClass('loading');
 							if(response.status==='success'){
 								let cb = function(){window.location.href = url;}
@@ -336,6 +421,7 @@
 				let $manu_select = $form.find('.fbf-wheel-search-manufacturer-select-v2');
 				let $chassis_select = $form.find('.fbf-wheel-search-chassis-select-v2');
 				let $postcode = $form.find('.fbf-wheel-search-postcode-v2');
+				let $fitting = $form.find('.sc-fbf-wheel-search__form-field.fitting');
 				let props = {
 					manufacturer_id: $manu_select.val(),
 					manufacturer: decodeURIComponent($manu_select.find(':selected').text()),
@@ -344,6 +430,13 @@
 					postcode: $postcode.val(),
 					origin: origin,
 				};
+				if($fitting.length){
+					if($fitting.val()=='fitted'){
+						props.is_fitted = 'true';
+					}else{
+						props.is_fitted = 'false';
+					}
+				}
 				console.log('wheel search mixpanel track from ' + origin);
 				window.mixpanel_track(event, props, cb);
 			}else if(origin==='homepage'){
