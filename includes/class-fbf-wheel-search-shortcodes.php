@@ -66,8 +66,7 @@ HTML;
         $chassis = Fbf_Wheel_Search_Public::chasis_dropdown_v3($id);
 
         if(is_plugin_active('litespeed-cache/litespeed-cache.php')){
-            $size_postcode_field = apply_filters('litespeed_esi_url', 'esi_postcode_form_block', 'Postcode form block', ['id' => $id, 'type' => 'size']);
-            $reg_postcode_field = apply_filters('litespeed_esi_url', 'esi_postcode_form_block', 'Postcode form block', ['id' => $id, 'type' => 'reg']);
+            $postcode_field = apply_filters('litespeed_esi_url', 'esi_postcode_form_block', 'Postcode form block', ['id' => $id, 'type' => ' ', 'classes' => 'fbf-wheel-search-postcode-v2 sc-fbf-wheel-search__form-field postcode']);
         }else{
             $postcode_field = sprintf('<input id="sc-fbf-wheel-search--postcode_%s" type="text" class="fbf-wheel-search-postcode-v2 sc-fbf-wheel-search__form-field postcode" data-search_postcode="%s" disabled />', $id, WC()->session->get('search_postcode'));
         }
