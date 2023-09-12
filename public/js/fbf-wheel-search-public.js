@@ -72,7 +72,7 @@
 
 						$.each(response.data, function(i, e){
 
-							console.log(e.chassis.display_name);
+							//console.log(e.chassis.display_name);
 
 							/*let start_year;
 							let end_year;
@@ -101,8 +101,6 @@
 						});
 						$chasis_select.empty();
 						$chasis_select.append(option);
-					}else{
-						console.log('There was an error: ' + response.error);
 					}
 				},
 			});
@@ -159,7 +157,7 @@
 			}else if(is_landing_page){
 				$chasis_select.unbind('change');
 				$chasis_select.on('change', function(e){
-					console.log('landing page change');
+					//console.log('landing page change');
 					//let $btn = $chasis_select.parents('.form-group').next();
 					let $btn = $('.single-landing-pages__btn');
 					$btn.unbind('click'); // Removes the click event
@@ -168,7 +166,7 @@
 					$btn.attr('data-vehicle', encodeURIComponent($chasis_select.find(':selected').text()));
 					$btn.attr('data-url', url);
 					$btn.bind('click', function(){
-						console.log('button clicked');
+						//console.log('button clicked');
 						window.landing_page_search();
 						/*if($(this).attr('data-brand')!==''){
 							url+= '#pa_brand-name=' + $(this).attr('data-brand');
@@ -192,7 +190,7 @@
 				$postcode.val('');
 
 				$chasis_select.on('change', function(e){
-					console.log('accessories');
+					//console.log('accessories');
 					$postcode.prop('disabled', false);
 					//console.log($manufacturer_select.val());
 					let url = '/accessories-search-results/chassis/' + $(this).val() + '/vehicle/' + encodeURIComponent($chasis_select.find(':selected').text()) + '/';
@@ -209,9 +207,6 @@
 
 					if(!$chasis_select.parents('.sc-fbf-accessory-search').length){
 						window.location.href = url;
-					}else{
-						console.log('it is the widget');
-						console.log('make button go to: ' + url);
 					}
 				});
 			}else if(is_widget){
@@ -229,7 +224,7 @@
 
 				$fitting.unbind('change');
 				$chasis_select.on('change', function(e){
-					console.log('chassis select change here - widget');
+					//console.log('chassis select change here - widget');
 					$fitting.attr('disabled', false);
 					$fitting.addClass('has-value');
 					$fitting.val('');
@@ -250,8 +245,8 @@
 		};
 
 		let $manufacturer_select = $('#fbf-wheel-search-manufacturer-select, #fbf-package-search-manufacturer-select, #fbf-fitment-manufacturer-select, .fbf-wheel-search-manufacturer-select-v2, .fbf-accessories-search-manufacturer-select');
-		console.log('manu select:');
-		console.log($manufacturer_select);
+		//console.log('manu select:');
+		//console.log($manufacturer_select);
 		if(!$manufacturer_select.attr('data-init_id')){
 			$manufacturer_select.val($manufacturer_select.find('option:first').val());
 		}else{
@@ -269,8 +264,8 @@
 			let id = $(this).attr('id');
 			let cl = 'fbf-wheel-search-manufacturer-select-v2';
 			let acl = 'fbf-accessories-search-manufacturer-select';
-			console.log('id:' + id);
-			console.log('class:' + cl);
+			//console.log('id:' + id);
+			//console.log('class:' + cl);
 			if(id==='fbf-wheel-search-manufacturer-select'){
 				$chasis_select = $('#fbf-wheel-search-chasis-select');
 			}else if(id==='fbf-package-search-manufacturer-select'){
@@ -289,7 +284,7 @@
 
 		// Size search fields
 		$('.wheel-search-widget-v2').find('input, select').bind('blur focus keyup change', function(){
-			console.log('wheel widget field');
+			//console.log('wheel widget field');
 			wheel_widget_form_check($(this));
 		});
 		$('.sc-fbf-wheel-search__form').find('input, select').bind('blur focus keyup change', function(){
@@ -299,28 +294,28 @@
 
 		// Size search fields
 		$('.sc-fbf-accessory-search__form').find('input, select').bind('blur focus keyup change', function(){
-			console.log('wheel widget field');
+			//console.log('wheel widget field');
 			accessory_widget_form_check($(this));
 		});
 
 		let $wheel_search_form = $('.wheel-search-widget-v2__form');
 		$wheel_search_form.on('submit', function(){
-			console.log('wheel search form submit');
+			//console.log('wheel search form submit');
 			let $btn = $wheel_search_form.find('.wheel-search-widget-v2__button');
 			$btn.trigger('click');
 			return false;
 		});
 
-		let $accessory_search_form = $('.accessory-search-widget-v2__form');
+		let $accessory_search_form = $('.sc-fbf-accessory-search__form');
 		$accessory_search_form.on('submit', function(){
-			console.log('accessory search form submit');
-			let $btn = $accessory_search_form.find('.accessory-search-widget-v2__button');
+			//console.log('accessory search form submit');
+			let $btn = $accessory_search_form.find('.sc-fbf-accessory-search__button');
 			$btn.trigger('click');
 			return false;
 		});
 
 		function wheel_widget_form_check($elem){
-			console.log('wheel widget form check');
+			//console.log('wheel widget form check');
 			let $form = $elem.parents('.wheel-search-widget-v2');
 			let $button = $form.find('.wheel-search-widget-v2__button');
 			let $manu_select = $form.find('.fbf-wheel-search-manufacturer-select-v2');
@@ -332,7 +327,7 @@
 				let url = '/wheel-search-results/chassis/' + $chassis_select.val() + '/vehicle/' + encodeURIComponent($chasis_select.find(':selected').text()) + '/';
 				$button.unbind('click');
 				$button.bind('click', function(){
-					console.log('wheel widget button click');
+					//console.log('wheel widget button click');
 					$button.addClass('loading');
 					//window.location.href = url;
 
@@ -375,7 +370,7 @@
 				let url = '/wheel-search-results/chassis/' + $chassis_select.val() + '/vehicle/' + encodeURIComponent($chasis_select.find(':selected').text()) + '/';
 				$button.unbind('click');
 				$button.bind('click', function(){
-					console.log('wheel widget button click');
+					//console.log('wheel widget button click');
 					$button.addClass('loading');
 					//window.location.href = url;
 
@@ -389,8 +384,8 @@
 						data: data,
 						dataType: 'json',
 						success: function (response) {
-							console.log(url);
-							console.log(response);
+							//console.log(url);
+							//console.log(response);
 							$button.removeClass('loading');
 							if(response.status==='success'){
 								let cb = function(){window.location.href = url;}
@@ -408,24 +403,50 @@
 		}
 
 		function accessory_widget_form_check($elem){
-			console.log('accessory widget form check');
+			//console.log('accessory widget form check');
 			let $form = $elem.parents('.sc-fbf-accessory-search__form');
 			let $button = $form.find('.sc-fbf-accessory-search__button');
 			let $manu_select = $form.find('.fbf-accessories-search-manufacturer-select');
 			let $chassis_select = $form.find('.fbf-accessories-search-chassis-select');
 			let $postcode = $form.find('.fbf-accessory-search-postcode-v2');
 
-			console.log('postcode value:');
-			console.log($postcode.val());
-			console.log($button);
+			//console.log('postcode value:');
+			//console.log($postcode.val());
+			//console.log($button);
 
 			if($manu_select.val()!==''&&$chassis_select.val()!==''&&$postcode.val()!==''){
 				$button.prop('disabled', false);
 				let url = '/accessories-search-results/chassis/' + $chassis_select.val() + '/vehicle/' + encodeURIComponent($chasis_select.find(':selected').text()) + '/';
 				$button.unbind('click');
 				$button.bind('click', function(){
-					window.location.href = url;
-					return false;
+					/*window.location.href = url;
+					return false;*/
+
+					$button.addClass('loading');
+					//window.location.href = url;
+
+					let data = {
+						action: 'postcode_check',
+						postcode: $postcode.val(),
+					}
+
+					$.ajax({
+						url: fbf_wheel_search_ajax_object.ajax_url,
+						type: 'POST',
+						data: data,
+						dataType: 'json',
+						success: function (response) {
+							//console.log(url);
+							//console.log(response);
+							$button.removeClass('loading');
+							if(response.status==='success'){
+								window.location.href = url;
+								//console.log('redirect to: ' + url);
+							}else if(response.status==='error'){
+								alert('An error occurred: ' + response.error);
+							}
+						},
+					});
 				});
 			}else{
 				$button.prop('disabled', true);
@@ -455,7 +476,7 @@
 						props.is_fitted = 'false';
 					}
 				}
-				console.log('wheel search mixpanel track from ' + origin);
+				//console.log('wheel search mixpanel track from ' + origin);
 				window.mixpanel_track(event, props, cb);
 			}else if(origin==='homepage'){
 				let $form = $elem;
@@ -469,8 +490,8 @@
 					origin: origin,
 				};
 
-				console.log('wheel search mixpanel track from ' + origin);
-				console.log(props);
+				//console.log('wheel search mixpanel track from ' + origin);
+				//console.log(props);
 				window.mixpanel_track(event, props, cb);
 			}
 		}
