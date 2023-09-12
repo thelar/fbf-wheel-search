@@ -175,4 +175,60 @@ HTML;
 HTML;
         return $html;
     }
+
+    public function accessory_search_v3($attrs)
+    {
+        if(!is_array($attrs)){
+            $id = '';
+        }else{
+            if(isset($attrs['id'])){
+                $id = $attrs['id'];
+            }else{
+                $id = '1';
+            }
+        }
+        $manu = Fbf_Wheel_Search_Public::manufacturers_dropdown_accessories_v2($id);
+        $chassis = Fbf_Wheel_Search_Public::chasis_dropdown_accessories_v2($id);
+
+        if(is_plugin_active('litespeed-cache/litespeed-cache.php')){
+            $postcode_field = apply_filters('litespeed_esi_url', 'esi_postcode_form_block', 'Postcode form block', ['id' => sprintf('fbf-accessory-search-postcode_%s', $id), 'type' => '', 'classes' => 'sc-fbf-accessory-search__form-field fbf-accessory-search-postcode-v2']);
+        }else{
+            $postcode_field = sprintf('<input id="fbf-accessory-search-postcode_%s" type="text" class="sc-fbf-accessory-search__form-field fbf-accessory-search-postcode-v2" data-search_postcode="%s" disabled />', $id, WC()->session->get('search_postcode'));
+        }
+
+        $html = <<<HTML
+<div id="sc-fbf-accessory-search_{$id}" class="sc-fbf-accessory-search">
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item flex-grow-1 d-flex">
+            <a class="nav-link flex-grow-1 active" id="sc-fbf-accessory-search__vehicle-tab" data-toggle="tab" href="#sc-fbf-accessory-search--vehicle" role="tab" aria-controls="sc-fbf-accessory-search--vehicle" aria-selected="true">Search by vehicle</a>
+        </li>
+    </ul>
+    <div class="tab-content" id="myTabContent">
+        <div class="sc-fbf-accessory-search__tab-pane tab-pane fade show active" id="sc-fbf-accessory-search--vehicle" role="tabpanel" aria-labelledby="sc-fbf-accessory-search__vehicle-tab">
+            
+            
+            <form id="accessory-search-widget-v2--{$id}" class="accessory-search-widget-v2__form sc-fbf-accessory-search__form" action="post">
+                {$manu}
+                {$chassis}
+                <div class="fbf-form-group sc-fbf-accessory-search__form--row">
+                    {$postcode_field}
+                    <label for="fbf-accessory-search-postcode_{$id}" class="control-label"><span class="floating-label">Postcode</span></label>
+                </div>
+                <div class="sc-fbf-accessory-search__form--row">
+                    <button id="tyre-reg-search--reg-button_{$id}" class="sc-fbf-accessory-search__button" type="button" rel="nofollow" role="submit" disabled>
+                        See products
+                        <span class="icon">
+                            <i class="fa fa-spinner fa-pulse"></i>
+                        </span>
+                    </button>
+                </div>
+            </form>
+            
+            
+        </div>
+    </div>
+</div>
+HTML;
+        return $html;
+    }
 }

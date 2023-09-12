@@ -184,6 +184,7 @@ class Fbf_Wheel_Search {
         $this->loader->add_shortcode('fbf_wheel_search_widget_v3', $plugin_public, 'wheel_search_widget_v3');
         $this->loader->add_shortcode('fbf_accessory_search_widget', $plugin_public, 'accessory_search_widget');
         $this->loader->add_shortcode('fbf_accessory_search_widget_v2', $plugin_public, 'accessory_search_widget_v2');
+        $this->loader->add_shortcode('fbf_accessory_search_widget_v3', $plugin_public, 'accessory_search_widget_v3');
 	}
 
 	/**

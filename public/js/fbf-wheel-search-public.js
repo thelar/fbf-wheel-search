@@ -185,11 +185,25 @@
 				});
 			}else if(is_accessories){
 				$chasis_select.unbind('change');
+				let $postcode = $('.fbf-accessory-search-postcode-v2');
+
+				$postcode.attr('disabled', true);
+				$postcode.removeClass('has-value');
+				$postcode.val('');
+
 				$chasis_select.on('change', function(e){
 					console.log('accessories');
+					$postcode.prop('disabled', false);
 					//console.log($manufacturer_select.val());
 					let url = '/accessories-search-results/chassis/' + $(this).val() + '/vehicle/' + encodeURIComponent($chasis_select.find(':selected').text()) + '/';
-					if(!$chasis_select.parents('.accessory-search-widget-v2').length){
+
+					if($(this).val().length > 0){
+						$postcode.attr('disabled', false);
+						$postcode.addClass('has-value');
+						$postcode.val($postcode.attr('data-search_postcode'));
+					}
+
+					if(!$chasis_select.parents('.sc-fbf-accessory-search').length){
 						window.location.href = url;
 					}else{
 						console.log('it is the widget');
@@ -280,7 +294,7 @@
 		});
 
 		// Size search fields
-		$('.accessory-search-widget-v2').find('input, select').bind('blur focus keyup change', function(){
+		$('.sc-fbf-accessory-search__form').find('input, select').bind('blur focus keyup change', function(){
 			console.log('wheel widget field');
 			accessory_widget_form_check($(this));
 		});
@@ -391,8 +405,8 @@
 
 		function accessory_widget_form_check($elem){
 			console.log('accessory widget form check');
-			let $form = $elem.parents('.accessory-search-widget-v2');
-			let $button = $form.find('.accessory-search-widget-v2__button');
+			let $form = $elem.parents('.sc-fbf-accessory-search__form');
+			let $button = $form.find('.sc-fbf-accessory-search__button');
 			let $manu_select = $form.find('.fbf-accessories-search-manufacturer-select');
 			let $chassis_select = $form.find('.fbf-accessories-search-chassis-select');
 			let $postcode = $form.find('.fbf-accessory-search-postcode-v2');

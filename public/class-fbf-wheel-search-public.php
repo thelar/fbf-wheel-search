@@ -156,6 +156,13 @@ class Fbf_Wheel_Search_Public {
         echo $sc->accessory_search_v2($atts);
     }
 
+    public function accessory_search_widget_v3($atts)
+    {
+        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-fbf-wheel-search-shortcodes.php';
+        $sc = new Fbf_Wheel_Search_Shortcodes();
+        echo $sc->accessory_search_v3($atts);
+    }
+
     public static function manufacturers_dropdown()
     {
         global $wpdb;
@@ -242,8 +249,8 @@ class Fbf_Wheel_Search_Public {
         $table = $wpdb->prefix . 'fbf_vehicle_manufacturers';
         $sql = "SELECT * FROM $table WHERE enabled = 1 ORDER BY display_name";
         $manufacturers = $wpdb->get_results($sql);
-        $html = '<div class="fbf-form-group form-group col-12 col-lg-6 pr-lg-3 mb-0">';
-        $html.= sprintf('<select class="accessories-widget__form-field fbf-accessories-search-manufacturer-select mb-3" id="%s_%s">', 'fbf-accessories-search-manufacturer-select', $id);
+        $html = '<div class="fbf-form-group sc-fbf-accessory-search__form--row">';
+        $html.= sprintf('<select class="accessories-widget__form-field fbf-accessories-search-manufacturer-select" id="%s_%s">', 'fbf-accessories-search-manufacturer-select', $id);
         $html.= sprintf('<option value="">Manufacturer</option>');
         if($manufacturers!==false){
             foreach($manufacturers as $manufacturer){
@@ -347,9 +354,9 @@ class Fbf_Wheel_Search_Public {
 
     public static function chasis_dropdown_accessories_v2($id=1)
     {
-        $html = '<div class="fbf-form-group form-group right col-12 col-lg-6 mb-0">';
-        $html.= sprintf('<select class="fbf-accessories-search-chassis-select accessories-widget__form-field mb-3" id="%s_%s">', 'fbf-accessories-search-select', $id);
-        $html.= sprintf('<option value="">Select model</option>');
+        $html = '<div class="fbf-form-group sc-fbf-accessory-search__form--row">';
+        $html.= sprintf('<select class="fbf-accessories-search-chassis-select accessories-widget__form-field" id="%s_%s" disabled>', 'fbf-accessories-search-select', $id);
+        //$html.= sprintf('<option value="">Select model</option>');
         $html.= '</select>';
         $html.= sprintf('<label for="%s_%s" class="control-label"><span class="floating-label">%s</span></label>', 'fbf-accessories-search-chasis-select', $id, 'Model');
         $html.= '</div>';
