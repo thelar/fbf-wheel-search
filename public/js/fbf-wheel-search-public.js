@@ -201,6 +201,10 @@
 						$postcode.attr('disabled', false);
 						$postcode.addClass('has-value');
 						$postcode.val($postcode.attr('data-search_postcode'));
+					}else{
+						$postcode.attr('disabled', true);
+						$postcode.removeClass('has-value');
+						$postcode.val('');
 					}
 
 					if(!$chasis_select.parents('.sc-fbf-accessory-search').length){
