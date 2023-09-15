@@ -314,6 +314,27 @@
 			return false;
 		});
 
+		// Temporary fix for ESI bug
+		if($('.sc-fbf-accessory-search__form-field.postcode, .sc-fbf-wheel-search__form-field.postcode').length){
+			let data = {
+				action: 'get_search_postcode',
+			};
+			$.ajax({
+				// eslint-disable-next-line no-undef
+				url: ajax_object.ajax_url,
+				type: 'POST',
+				data: data,
+				dataType: 'json',
+				success: function (response) {
+					if(response.status==='success'){
+						if(response.search_postcode){
+							$('.sc-fbf-accessory-search__form-field.postcode, .sc-fbf-wheel-search__form-field.postcode').attr('data-search_postcode', response.search_postcode);
+						}
+					}
+				},
+			});
+		}
+
 		function wheel_widget_form_check($elem){
 			//console.log('wheel widget form check');
 			let $form = $elem.parents('.wheel-search-widget-v2');

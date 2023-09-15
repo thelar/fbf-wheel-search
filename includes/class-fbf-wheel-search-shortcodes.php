@@ -70,6 +70,7 @@ HTML;
         }else{
             $postcode_field = sprintf('<input id="sc-fbf-wheel-search--postcode_%s" type="text" class="fbf-wheel-search-postcode-v2 sc-fbf-wheel-search__form-field postcode" data-search_postcode="%s" disabled />', $id, WC()->session->get('search_postcode'));
         }
+        $postcode_field = sprintf('<input id="sc-fbf-wheel-search--postcode_%s" type="text" class="fbf-wheel-search-postcode-v2 sc-fbf-wheel-search__form-field postcode" data-search_postcode="" disabled />', $id);
 
         $html = <<<HTML
 <div id="sc-fbf-wheel-search_{$id}" class="sc-fbf-wheel-search">
@@ -195,6 +196,7 @@ HTML;
         }else{
             $postcode_field = sprintf('<input id="fbf-accessory-search-postcode_%s" type="text" class="sc-fbf-accessory-search__form-field fbf-accessory-search-postcode-v2" data-search_postcode="%s" disabled />', $id, WC()->session->get('search_postcode'));
         }
+        $postcode_field = sprintf('<input id="fbf-accessory-search-postcode_%s" type="text" class="sc-fbf-accessory-search__form-field fbf-accessory-search-postcode-v2 postcode" data-search_postcode="" disabled />', $id);
 
         $html = <<<HTML
 <div id="sc-fbf-accessory-search_{$id}" class="sc-fbf-accessory-search">
