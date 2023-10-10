@@ -379,11 +379,12 @@
 		}
 
 		function sc_wheel_widget_form_check($elem){
+			console.log('sc_wheel_widget_form_check');
 			let $form = $elem.parents('.sc-fbf-wheel-search__form');
 			let $button = $form.find('.sc-fbf-wheel-search__button');
 			let $manu_select = $form.find('.fbf-wheel-search-manufacturer-select-v2');
 			let $chassis_select = $form.find('.fbf-wheel-search-chassis-select-v2');
-			let $fitting_select = $form.find('sc-fbf-wheel-search__form-field.fitting');
+			let $fitting_select = $form.find('.sc-fbf-wheel-search__form-field.fitting');
 			let $postcode = $form.find('.sc-fbf-wheel-search__form-field.postcode');
 
 			if($manu_select.val()!==''&&$chassis_select.val()!==''&&$fitting_select.val()!==''&&$postcode.val()!==''){
@@ -391,22 +392,23 @@
 				let url = '/wheel-search-results/chassis/' + $chassis_select.val() + '/vehicle/' + encodeURIComponent($chasis_select.find(':selected').text()) + '/';
 				$button.unbind('click');
 				$button.bind('click', function(){
-					//console.log('wheel widget button click');
+					console.log('wheel widget button click');
 					$button.addClass('loading');
-					//window.location.href = url;
 
 					let data = {
 						action: 'postcode_check',
 						postcode: $postcode.val(),
+						fitting_required: $fitting_select.val(),
 					}
+					console.log(data);
 					$.ajax({
 						url: fbf_wheel_search_ajax_object.ajax_url,
 						type: 'POST',
 						data: data,
 						dataType: 'json',
 						success: function (response) {
-							//console.log(url);
-							//console.log(response);
+							console.log(url);
+							console.log(response);
 							$button.removeClass('loading');
 							if(response.status==='success'){
 								let cb = function(){window.location.href = url;}
