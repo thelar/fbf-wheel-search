@@ -355,6 +355,7 @@
 					let data = {
 						action: 'postcode_check',
 						postcode: $postcode.val(),
+
 					}
 					$.ajax({
 						url: fbf_wheel_search_ajax_object.ajax_url,
@@ -383,7 +384,7 @@
 			let $button = $form.find('.sc-fbf-wheel-search__button');
 			let $manu_select = $form.find('.fbf-wheel-search-manufacturer-select-v2');
 			let $chassis_select = $form.find('.fbf-wheel-search-chassis-select-v2');
-			let $fitting_select = $form.find('sc-fbf-wheel-search__form-field.fitting');
+			let $fitting_select = $form.find('.sc-fbf-wheel-search__form-field.fitting');
 			let $postcode = $form.find('.sc-fbf-wheel-search__form-field.postcode');
 
 			if($manu_select.val()!==''&&$chassis_select.val()!==''&&$fitting_select.val()!==''&&$postcode.val()!==''){
@@ -395,9 +396,12 @@
 					$button.addClass('loading');
 					//window.location.href = url;
 
+					//console.log($fitting_select.val());
+
 					let data = {
 						action: 'postcode_check',
 						postcode: $postcode.val(),
+						fitting_required: $fitting_select.val(),
 					}
 					$.ajax({
 						url: fbf_wheel_search_ajax_object.ajax_url,
