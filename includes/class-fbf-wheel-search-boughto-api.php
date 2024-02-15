@@ -316,6 +316,9 @@ class Fbf_Wheel_Search_Boughto_Api
      */
     public function wheel_fits_chassis($product_id, $chassis_id)
     {
+        if($this->is_a_bot()){
+            return true; // Always return true for Bots to fix discrepancy issue with Google feed (basically, for bots in stock products are available to purchase)
+        }
         $wheels = $this->get_wheels($chassis_id);
         if(!empty($wheels['results'])){
             $sku = wc_get_product($product_id)->get_sku();
@@ -352,5 +355,23 @@ class Fbf_Wheel_Search_Boughto_Api
             }
         }
         return $data;
+    }
+
+    public function is_a_bot(){
+
+        $is_bot = false;
+
+        $user_agents = array( 'GTmetrix', 'Googlebot', 'Storebot', 'Bingbot', 'BingPreview', 'msnbot', 'slurp', 'Ask Jeeves/Teoma', 'Baidu', 'DuckDuckBot', 'AOLBuild' );
+
+        $user_agent = $_SERVER['HTTP_USER_AGENT'];
+
+        foreach ( $user_agents as $agent ){
+            if ( strpos( $user_agent, $agent) ){
+                $is_bot = true;
+            }
+        }
+
+        return $is_bot;
+
     }
 }
