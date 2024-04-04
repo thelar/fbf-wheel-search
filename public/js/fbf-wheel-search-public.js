@@ -413,6 +413,7 @@
 							//console.log(response);
 							$button.removeClass('loading');
 							if(response.status==='success'){
+								console.log('postcode_check end time: ' + response.end);
 								let cb = function(){window.location.href = url;}
 								mixpanel_track($form, 'widget', cb);
 							}else if(response.status==='error'){
