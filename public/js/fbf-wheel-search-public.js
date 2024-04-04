@@ -411,7 +411,7 @@
 						success: function (response) {
 							//console.log(url);
 							//console.log(response);
-							$button.removeClass('loading');
+							//$button.removeClass('loading'); -- keep showing loading
 							if(response.status==='success'){
 								console.log('postcode_check end time: ' + response.end);
 								let cb = function(){window.location.href = url;}
