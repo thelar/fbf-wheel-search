@@ -187,8 +187,12 @@ class Fbf_Wheel_Search_Boughto_Api
         }
     }
 
-    public function get_wheels($chasis_id)
+    public function get_wheels($chasis_id, $use_cache = true)
     {
+        if(!$use_cache){
+            $this->cache = false;
+        }
+
         $num_results = 500;
         $key = "boughto_wheels_for_chasis_{$chasis_id}";
         $transient = get_transient($key);
