@@ -123,8 +123,11 @@ class Fbf_Wheel_Search_Boughto_Api
         wp_redirect(get_admin_url() . 'admin.php?page=' . $this->plugin_name . '&fbf_wheel_search_status=' . $status . '&fbf_wheel_search_message=' . $message);
     }
 
-    public function get_chasis($manu_id)
+    public function get_chasis($manu_id, $use_cache = true)
     {
+        if(!$use_cache){
+            $this->cache = false;
+        }
 
         if (empty($manu_id) || !is_numeric($manu_id)) {
             return false;
