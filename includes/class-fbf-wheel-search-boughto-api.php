@@ -221,7 +221,7 @@ class Fbf_Wheel_Search_Boughto_Api
                         }
                     }
                 }
-                $data['results'] = $this->simplyfy($results, ['product_code', 'id']);
+                $data['results'] = $this->simplify($results, ['product_code', 'id']);
                 set_transient($key, $data, WEEK_IN_SECONDS);
                 return $data;
             }else{
@@ -382,7 +382,7 @@ class Fbf_Wheel_Search_Boughto_Api
 
     }
 
-    private function simplyfy($results, $keep){
+    private function simplify($results, $keep){
         $return = [];
         foreach($results as $item){
             $new_item = [];
