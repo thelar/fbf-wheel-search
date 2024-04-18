@@ -221,7 +221,7 @@ class Fbf_Wheel_Search_Boughto_Api
                         }
                     }
                 }
-                $data['results'] = $results;
+                $data['results'] = $this->simplyfy($results, ['product_code', 'id']);
                 set_transient($key, $data, WEEK_IN_SECONDS);
                 return $data;
             }else{
@@ -380,5 +380,19 @@ class Fbf_Wheel_Search_Boughto_Api
 
         return $is_bot;
 
+    }
+
+    private function simplyfy($results, $keep){
+        $return = [];
+        foreach($results as $item){
+            $new_item = [];
+            foreach($item as $k => $v){
+                if(in_array($k, $keep)){
+                    $new_item[$k] = $v;
+                }
+            }
+            $return[] = $new_item;
+        }
+        return $return;
     }
 }
