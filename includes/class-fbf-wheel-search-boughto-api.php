@@ -344,8 +344,12 @@ class Fbf_Wheel_Search_Boughto_Api
      * @param $chassis_id
      * @return array
      */
-    public function get_upsteps($chassis_id)
+    public function get_upsteps($chassis_id, $use_cache = true)
     {
+        if(!$use_cache){
+            $this->cache = false;
+        }
+
         $key = "boughto_upsteps_for_chassis_{$chassis_id}";
         $transient = get_transient($key);
 
