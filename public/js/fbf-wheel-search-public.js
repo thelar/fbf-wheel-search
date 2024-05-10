@@ -410,7 +410,9 @@
 						dataType: 'json',
 						success: function (response) {
 							//console.log(url);
-							//console.log(response);
+							console.log('wheel widget search');
+							console.log(response);
+							console.log(response.is_national_fitting);
 							//$button.removeClass('loading'); -- keep showing loading
 							if(response.status==='success'){
 								console.log('postcode_check end time: ' + response.end);
