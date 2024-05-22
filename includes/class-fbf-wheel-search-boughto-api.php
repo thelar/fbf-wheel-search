@@ -222,7 +222,7 @@ class Fbf_Wheel_Search_Boughto_Api
                     }
                 }
                 //$data['results'] = $results;
-                $data['results'] = $this->simplify($results, ['product_code', 'id']); // We only need to store a fraction of the amount of data returned from boughto
+                $data['results'] = $this->simplify($results, ['product_code', 'id', 'seat_type', 'center_bore']); // We only need to store a fraction of the amount of data returned from boughto
                 set_transient($key, $data, WEEK_IN_SECONDS);
                 return $data;
             }else{
