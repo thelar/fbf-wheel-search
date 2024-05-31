@@ -327,7 +327,7 @@ class Fbf_Wheel_Search_Boughto_Api
         if($this->is_a_bot()){
             return true; // Always return true for Bots to fix discrepancy issue with Google feed (basically, for bots in stock products are available to purchase)
         }
-        $wheels = $this->get_wheels($chassis_id, false);
+        $wheels = $this->get_wheels($chassis_id);
         if(!empty($wheels['results'])){
             $sku = wc_get_product($product_id)->get_sku();
             $search = array_search($sku, array_column($wheels['results'], 'product_code'));
