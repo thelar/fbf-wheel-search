@@ -231,6 +231,19 @@ class Fbf_Wheel_Search_Boughto_Api
         }
     }
 
+    public function get_wheel_by_sku($sku)
+    {
+        $url = sprintf('%s/wheels/product_code/%s', $this->api_url, $sku);
+        $response = wp_remote_get($url, $this->headers);
+
+        if(!is_wp_error($response)&&is_array($response)){
+            $data = json_decode(wp_remote_retrieve_body($response), true);
+            return $data;
+        }else{
+            return $response;
+        }
+    }
+
     public function get_wheels_v4($chasis_id)
     {
         $key = "boughto_v4_wheels_for_chasis_{$chasis_id}";
