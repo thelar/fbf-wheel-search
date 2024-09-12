@@ -197,6 +197,8 @@ class Fbf_Wheel_Search_Boughto_Api
         $key = "boughto_wheels_for_chasis_{$chasis_id}";
         $transient = get_transient($key);
 
+        $upsteps = $this->get_upsteps($chasis_id);
+
         if(!empty($transient)&&$this->cache){
             return $transient;
         }else{
@@ -221,8 +223,9 @@ class Fbf_Wheel_Search_Boughto_Api
                         }
                     }
                 }
+                $results = $this->process_upsteps($results, $upsteps['upsteps']);
                 //$data['results'] = $results;
-                $data['results'] = $this->simplify($results, ['product_code', 'id', 'seat_type', 'center_bore', 'family']); // We only need to store a fraction of the amount of data returned from boughto
+                $data['results'] = $this->simplify($results, ['product_code', 'id', 'seat_type', 'center_bore', 'family', 'upstep']); // We only need to store a fraction of the amount of data returned from boughto
                 set_transient($key, $data, WEEK_IN_SECONDS);
                 return $data;
             }else{
@@ -408,5 +411,24 @@ class Fbf_Wheel_Search_Boughto_Api
             $return[] = $new_item;
         }
         return $return;
+    }
+
+    private function process_upsteps($results, $upsteps)
+    {
+        foreach($results as $wi => $wheel){
+            foreach($upsteps as $ui => $upstep){
+                if($wheel['diameter']==$upstep['diameter']&&$wheel['width']==$upstep['width']){
+                    if((float)$wheel['offset_et']>=(float)$upstep['min_offset']&&(float) $wheel['offset_et']<=(float)$upstep['max_offset']){
+                        if($upstep['comment']==='IDEAL'||$upstep['comment']==='SPECIALIST'){
+                            $results[$wi]['upstep'] = strtolower($upstep['comment']);
+                        }else{
+                            $results[$wi]['upstep'] = 'alternative';
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        return $results;
     }
 }
