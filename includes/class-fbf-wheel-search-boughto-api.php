@@ -239,10 +239,10 @@ class Fbf_Wheel_Search_Boughto_Api
                     $headers = "MIME-Version: 1.0\r\n";
                     $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
                     $subject = sprintf('Chassis %s $upsteps[\'upsteps\'] not array', $chasis_id);
-                    $msg = '<h1>$results:</h1>';
+                    $msg = '<h1>$upsteps:</h1>';
                     ob_start();
                     echo '<pre>';
-                    print_r($upsteps['upsteps']);
+                    print_r($upsteps);
                     echo '</pre>';
                     $msg.= ob_get_clean();
                     $mail = wp_mail('kevin@code-mill.co.uk', $subject, $msg, $headers);
