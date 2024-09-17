@@ -242,7 +242,7 @@ class Fbf_Wheel_Search_Boughto_Api
                     $msg = '<h1>$results:</h1>';
                     ob_start();
                     echo '<pre>';
-                    print_r($results);
+                    print_r($upsteps['upsteps']);
                     echo '</pre>';
                     $msg.= ob_get_clean();
                     $mail = wp_mail('kevin@code-mill.co.uk', $subject, $msg, $headers);
