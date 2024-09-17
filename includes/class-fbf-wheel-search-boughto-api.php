@@ -235,6 +235,18 @@ class Fbf_Wheel_Search_Boughto_Api
                     $msg.= ob_get_clean();
                     $mail = wp_mail('kevin@code-mill.co.uk', $subject, $msg, $headers);
                 }
+                if(!is_array($upsteps['upsteps'])){
+                    $headers = "MIME-Version: 1.0\r\n";
+                    $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
+                    $subject = sprintf('Chassis %s $upsteps[\'upsteps\'] not array', $chasis_id);
+                    $msg = '<h1>$results:</h1>';
+                    ob_start();
+                    echo '<pre>';
+                    print_r($results);
+                    echo '</pre>';
+                    $msg.= ob_get_clean();
+                    $mail = wp_mail('kevin@code-mill.co.uk', $subject, $msg, $headers);
+                }
                 $results = $this->process_upsteps($results, $upsteps['upsteps']);
                 //$data['results'] = $results;
                 $data['results'] = $this->simplify($results, ['product_code', 'id', 'seat_type', 'center_bore', 'family', 'upstep']); // We only need to store a fraction of the amount of data returned from boughto
