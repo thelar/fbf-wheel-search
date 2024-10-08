@@ -140,10 +140,15 @@ class Fbf_Wheel_Search_Boughto_Api
             return $transient;
         } else {
             $url = sprintf('%s/vehicles/manufacturers/%d/chassis', $this->api_url, (int)$manu_id);
+            //$url = 'http://4x4tyres.localhost/403';
 
             $response = wp_remote_get($url, $this->headers);
 
             if(!is_wp_error($response)&&is_array($response)){
+                if($response['response']['code']===403){ // 403 is triggered when we exceed Boughto's rate cap - just return the response itself
+                    return $response;
+                }
+
                 $data = json_decode(wp_remote_retrieve_body($response), true);
 
                 if($data['status']==='success'){
@@ -175,9 +180,15 @@ class Fbf_Wheel_Search_Boughto_Api
             return $transient;
         }else{
             $url = sprintf('%s/vehicles/chassis/%d', $this->api_url, $chassis_id);
+            //$url = 'http://4x4tyres.localhost/403';
+
             $response = wp_remote_get($url, $this->headers);
 
             if(!is_wp_error($response)&&is_array($response)){
+                if($response['response']['code']===403){ // 403 is triggered when we exceed Boughto's rate cap - just return the response itself
+                    return $response;
+                }
+
                 $data = json_decode(wp_remote_retrieve_body($response), true);
                 set_transient($key, $data, WEEK_IN_SECONDS);
                 return $data;
@@ -197,16 +208,24 @@ class Fbf_Wheel_Search_Boughto_Api
         $key = "boughto_wheels_for_chasis_{$chasis_id}";
         $transient = get_transient($key);
 
-        $upsteps = $this->get_upsteps($chasis_id);
+        $upsteps = $this->get_upsteps($chasis_id, $use_cache);
+        if($upsteps['response']['code']===403){ // 403 is triggered when we exceed Boughto's rate cap - just return the response itself
+            return $upsteps;
+        }
 
         if(!empty($transient)&&$this->cache){
             return $transient;
         }else{
             $url = sprintf('%s/search/wheels?chassis_id=%d&ignore_no_price=1&ignore_no_stock=1&itemsPerPage=%d&use_load_rating=1', $this->api_url, $chasis_id, $num_results);
+            //$url = 'http://4x4tyres.localhost/403';
 
             $response = wp_remote_get($url, $this->headers);
 
             if(!is_wp_error($response)&&is_array($response)){
+                if($response['response']['code']===403){ // 403 is triggered when we exceed Boughto's rate cap - just return the response itself
+                    return $response;
+                }
+
                 $data = json_decode(wp_remote_retrieve_body($response), true);
                 $results = $data['results'];
 
@@ -218,6 +237,10 @@ class Fbf_Wheel_Search_Boughto_Api
                         $response = wp_remote_get($page_url, $this->headers);
 
                         if(!is_wp_error($response)&&is_array($response)){
+                            if($response['response']['code']===403){ // 403 is triggered when we exceed Boughto's rate cap - just return the response itself
+                                return $response;
+                            }
+
                             $page_data = json_decode(wp_remote_retrieve_body($response), true);
                             $results = array_merge($results, $page_data['results']);
                         }
@@ -384,8 +407,12 @@ class Fbf_Wheel_Search_Boughto_Api
      * @param $chassis_id
      * @return array
      */
-    public function get_upsteps($chassis_id)
+    public function get_upsteps($chassis_id, $use_cache = true)
     {
+        if(!$use_cache){
+            $this->cache = false;
+        }
+
         $key = "boughto_upsteps_for_chassis_{$chassis_id}";
         $transient = get_transient($key);
 
@@ -393,10 +420,15 @@ class Fbf_Wheel_Search_Boughto_Api
             $data = $transient;
         }else{
             $url = sprintf("%s/vehicles/chassis/%d/upsteps", $this->api_url, (int)$chassis_id);
+            //$url = 'http://4x4tyres.localhost/403';
 
             $response = wp_remote_get($url, $this->headers);
 
-            if (is_array($response)) {
+            if(!is_wp_error($response)&&is_array($response)){
+                if($response['response']['code']===403){ // 403 is triggered when we exceed Boughto's rate cap - just return the response itself
+                    return $response;
+                }
+
                 $data = json_decode(wp_remote_retrieve_body($response), true);
                 $data['url'] = $url;
                 set_transient($key, $data, WEEK_IN_SECONDS);
