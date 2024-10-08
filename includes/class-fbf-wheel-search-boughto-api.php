@@ -140,7 +140,7 @@ class Fbf_Wheel_Search_Boughto_Api
             return $transient;
         } else {
             $url = sprintf('%s/vehicles/manufacturers/%d/chassis', $this->api_url, (int)$manu_id);
-            //$url = 'http://4x4tyres.localhost/403';
+            //$url = 'https://staging.4x4tyres.co.uk/403';
 
             $response = wp_remote_get($url, $this->headers);
 
@@ -180,7 +180,7 @@ class Fbf_Wheel_Search_Boughto_Api
             return $transient;
         }else{
             $url = sprintf('%s/vehicles/chassis/%d', $this->api_url, $chassis_id);
-            //$url = 'http://4x4tyres.localhost/403';
+            //$url = 'https://staging.4x4tyres.co.uk/403';
 
             $response = wp_remote_get($url, $this->headers);
 
@@ -217,7 +217,7 @@ class Fbf_Wheel_Search_Boughto_Api
             return $transient;
         }else{
             $url = sprintf('%s/search/wheels?chassis_id=%d&ignore_no_price=1&ignore_no_stock=1&itemsPerPage=%d&use_load_rating=1', $this->api_url, $chasis_id, $num_results);
-            //$url = 'http://4x4tyres.localhost/403';
+            //$url = 'https://staging.4x4tyres.co.uk/403';
 
             $response = wp_remote_get($url, $this->headers);
 
@@ -420,7 +420,7 @@ class Fbf_Wheel_Search_Boughto_Api
             $data = $transient;
         }else{
             $url = sprintf("%s/vehicles/chassis/%d/upsteps", $this->api_url, (int)$chassis_id);
-            //$url = 'http://4x4tyres.localhost/403';
+            //$url = 'https://staging.4x4tyres.co.uk/403';
 
             $response = wp_remote_get($url, $this->headers);
 
