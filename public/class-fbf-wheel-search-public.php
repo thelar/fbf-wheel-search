@@ -388,14 +388,44 @@ class Fbf_Wheel_Search_Public {
 
         require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-fbf-wheel-search-boughto-api.php';
         $api = new Fbf_Wheel_Search_Boughto_Api($this->option_name, $this->plugin_name);
-
+        $wheel_data = $api->get_wheels($chassis_id);
         $fits = $api->wheel_fits_chassis($product_id, $chassis_id);
-        echo json_encode([
+        $manufacturer_id = $wheel_data['manufacturer']['id'];
+        $product = wc_get_product($product_id);
+        $resp = [
             'status' => 'success',
             'fits' => $fits,
             'vehicle' => $vehicle,
             'id' => $chassis_id,
-        ]);
+        ];
+        if($pb_data = $wheel_data['results'][array_search($product->get_sku(), array_column($wheel_data['results'], 'product_code'))]){
+            if(key_exists('upstep', $pb_data) && !empty($pb_data['upstep'])){
+
+                $stage_1_fitted = [
+                    'manufacturer' => $manufacturer_id,
+                    'chassis' => $chassis_id,
+                    'wheel_size' => (int) $product->get_attribute('pa_wheel-size'),
+                    'fitting' => 'fitted',
+                ];
+                $stage_1_nonfitted = [
+                    'manufacturer' => $manufacturer_id,
+                    'chassis' => $chassis_id,
+                    'wheel_size' => (int) $product->get_attribute('pa_wheel-size'),
+                    'fitting' => 'fitted',
+                ];
+                $stage_2 = [
+                    'wheel_id' => $pb_data['id'],
+                    'post_id' => $product->get_id(),
+                    'qty' => $product->get_stock_quantity()>=4?4:$product->get_stock_quantity(),
+                    'group' => $pb_data['upstep'],
+                ];
+
+                $resp['pb_link_fitted'] = 'stage_1=' . urlencode(json_encode($stage_1_fitted)) . '&stage_2=' . urlencode(json_encode($stage_2)) . '&current_stage=3';
+                $resp['pb_link_nonfitted'] = 'stage_1=' . urlencode(json_encode($stage_1_nonfitted)) . '&stage_2=' . urlencode(json_encode($stage_2)) . '&current_stage=3';
+            }
+        }
+
+        echo json_encode($resp);
         die();
 	}
 

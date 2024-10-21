@@ -141,12 +141,24 @@
 								if(response.status==='success'){
 									let $fitting;
 									if(response.fits){
+										console.log('it fits');
+										console.log(response);
 										$fitting = $(`<p class="single-product__fitment-info success mt-4 mb-0"><i class="fas fa-check-circle fa-lg mr-2"></i> These wheels fit a <strong>${response.vehicle}</strong></p>`);
 										$('.single-product__add-basket-btn, .single-product__qty-select').prop('disabled', false);
+										if(response.pb_link_fitted){
+											console.log('here 1');
+											$('.single-product__add-basket-btn.fitted').attr('data-pb-link', response.pb_link_fitted);
+										}
+										if(response.pb_link_nonfitted){
+											console.log('here 2');
+											$('.single-product__add-basket-btn.delivery-only').attr('data-pb-link', response.pb_link_nonfitted);
+										}
 									}else{
 										let link = `/wheel-search-results/chassis/${response.id}/vehicle/${encodeURIComponent(response.vehicle)}/`
 										$fitting = $(`<p class="single-product__fitment-info fail mt-4 mb-0"><i class="fas fa-times-circle fa-lg mr-2"></i> These wheels do not fit a <strong>${response.vehicle}</strong><br/><a href="${link}" class="d-inline-block mt-2">Find wheels that fit your vehicle &gt;</a></p>`);
 										$('.single-product__add-basket-btn, .single-product__qty-select').prop('disabled', true);
+										$('.single-product__add-basket-btn.delivery-only').attr('data-pb-link', '');
+										$('.single-product__add-basket-btn.fitting').attr('data-pb-link', '');
 									}
 									$info.append($fitting);
 								}
