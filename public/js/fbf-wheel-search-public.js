@@ -108,8 +108,10 @@
 			if(!is_packages_page && !is_landing_page && !is_widget && !is_accessories){
 				$chasis_select.unbind('change');
 				$chasis_select.on('change', function(e){
+					console.log('chassis selected');
+					let chassis_select_id = $(this).attr('id');
 					let $manu;
-					if($(this).attr('id')==='fbf-wheel-search-chasis-select'){
+					if(chassis_select_id==='fbf-wheel-search-chasis-select'){
 						$manu = $('#fbf-wheel-search-manufacturer-select');
 						//console.log($manufacturer_select.val());
 						let url = '/wheel-search-results/chassis/' + $(this).val() + '/vehicle/' + encodeURIComponent($chasis_select.find(':selected').text()) + '/';
@@ -117,14 +119,22 @@
 						let cb = function(){window.location.href = url;}
 						mixpanel_track($chasis_select.parents('.homepage__box__content'), 'homepage', cb);
 
-					}else if($(this).attr('id')==='fbf-package-search-chasis-select'){
+					}else if(chassis_select_id==='fbf-package-search-chasis-select'){
 						$manu = $('#fbf-package-search-manufacturer-select');
 						let url = '/tyre-wheel-packages/chassis/' + $(this).val() + '/vehicle/' + $manu.val() + '/name/' + encodeURIComponent($chasis_select.find(':selected').text()) + '/';
 						//console.log(url);
 						window.location.href = url;
-					}else if($(this).attr('id')==='fbf-fitment-chasis-select'){
+					}else if(chassis_select_id==='fbf-fitment-chasis-select'||chassis_select_id==='fbf-fitment-chasis-select-modal'){
 						let $info = $('#fitment-info');
+						let $modal_info = $('#check-fitment-modal-info');
+						let $modal_proceed = $('#check-fitment-proceed');
 						$info.empty();
+						$modal_info.empty();
+						$modal_proceed.unbind('click');
+						if(chassis_select_id==='fbf-fitment-chasis-select-modal'){
+							$modal_info.append('<p class="mt-0 mb-4"><span class="icon"><i class="fa fa-spinner fa-pulse fa-lg"></i></span>&nbsp;&nbsp;Checking fitment - <strong>please wait</strong></p>');
+							$modal_proceed.prop('disabled', true);
+						}
 						let data = {
 							action: 'fbf_wheel_fitment',
 							product_id: $(this).attr('data-product_id'),
@@ -140,10 +150,12 @@
 							success: function (response) {
 								if(response.status==='success'){
 									let $fitting;
+									let $fitting_modal;
 									if(response.fits){
 										console.log('it fits');
 										console.log(response);
 										$fitting = $(`<p class="single-product__fitment-info success mt-4 mb-0"><i class="fas fa-check-circle fa-lg mr-2"></i> These wheels fit a <strong>${response.vehicle}</strong></p>`);
+										$fitting_modal = $(`<p class="single-product__fitment-info success mt-0 mb-4"><i class="fas fa-check-circle fa-lg mr-2"></i> These wheels fit a <strong>${response.vehicle}</strong></p>`);
 										$('.single-product__add-basket-btn, .single-product__qty-select').prop('disabled', false);
 										if(response.pb_link_fitted){
 											console.log('here 1');
@@ -156,11 +168,27 @@
 									}else{
 										let link = `/wheel-search-results/chassis/${response.id}/vehicle/${encodeURIComponent(response.vehicle)}/`
 										$fitting = $(`<p class="single-product__fitment-info fail mt-4 mb-0"><i class="fas fa-times-circle fa-lg mr-2"></i> These wheels do not fit a <strong>${response.vehicle}</strong><br/><a href="${link}" class="d-inline-block mt-2">Find wheels that fit your vehicle &gt;</a></p>`);
+										$fitting_modal = $(`<p class="single-product__fitment-info fail mt-0 mb-4"><i class="fas fa-times-circle fa-lg mr-2"></i> These wheels do not fit a <strong>${response.vehicle}</strong><br/><a href="${link}" class="d-inline-block mt-2">Find wheels that fit your vehicle &gt;</a></p>`);
 										$('.single-product__add-basket-btn, .single-product__qty-select').prop('disabled', true);
 										$('.single-product__add-basket-btn.delivery-only').attr('data-pb-link', '');
 										$('.single-product__add-basket-btn.fitting').attr('data-pb-link', '');
 									}
 									$info.append($fitting);
+									if(chassis_select_id==='fbf-fitment-chasis-select-modal'){
+										$modal_info.empty();
+										$modal_info.append($fitting_modal);
+										if(response.fits){
+											let $modal = $('#check-fitment-modal');
+											$modal.attr('data-check-valid', true);
+											$modal_proceed.prop('disabled', false);
+											$modal_proceed.bind('click', function(){
+												$modal.modal('hide');
+												return false;
+											});
+										}else{
+											$modal_proceed.prop('disabled', true);
+										}
+									}
 								}
 							}
 						});
@@ -292,6 +320,12 @@
 
 			$chasis_select.addClass('has-value');
 			window.populate_chasis($chasis_select, $(this).val(), is_packages_page, false);
+		});
+
+		let $manufacturer_select_fitment_modal = $('#fbf-fitment-manufacturer-select-modal');
+		$manufacturer_select_fitment_modal.on('change', function(e) {
+			$chasis_select = $('#fbf-fitment-chasis-select-modal');
+			window.populate_chasis($chasis_select, $(this).val(), false, false);
 		});
 
 		// Size search fields

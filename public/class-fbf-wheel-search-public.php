@@ -281,7 +281,7 @@ class Fbf_Wheel_Search_Public {
         return $html;
 	}
 
-    public static function manufacturers_dropdown_fitment()
+    public static function manufacturers_dropdown_fitment($id_override = false)
     {
         global $wpdb;
         $table = $wpdb->prefix . 'fbf_vehicle_manufacturers';
@@ -289,12 +289,18 @@ class Fbf_Wheel_Search_Public {
         $manufacturers = $wpdb->get_results($sql);
         $html = '';
 
+        if($id_override){
+            $select_id = $id_override;
+        }else{
+            $select_id = 'fbf-fitment-manufacturer-select';
+        }
+
         if(isset(WC()->session->get('fbf_last_chassis_search')['manufacturer_id'])){
             $manu_id = WC()->session->get('fbf_last_chassis_search')['manufacturer_id'];
             $chassis_id = WC()->session->get('fbf_last_chassis_search')['chassis_id'];
-            $html.= sprintf('<select class="single-product__fitment-select mb-4" id="%s" data-init_id="%s" data-chassis_id="%s">', 'fbf-fitment-manufacturer-select', $manu_id, $chassis_id);
+            $html.= sprintf('<select class="single-product__fitment-select mb-4" id="%s" data-init_id="%s" data-chassis_id="%s">', $select_id, $manu_id, $chassis_id);
         }else{
-            $html.= sprintf('<select class="single-product__fitment-select mb-4" id="%s">', 'fbf-fitment-manufacturer-select');
+            $html.= sprintf('<select class="single-product__fitment-select mb-4" id="%s">', $select_id);
             $manu_id = '';
         }
 
@@ -374,6 +380,14 @@ class Fbf_Wheel_Search_Public {
     public static function chasis_dropdown_fitment($product_id)
     {
         $html = sprintf('<select class="single-product__fitment-select mb-0" id="%s" data-product_id="%s">', 'fbf-fitment-chasis-select', $product_id);
+        $html.= sprintf('<option value="">Select model</option>');
+        $html.= '</select>';
+        return $html;
+	}
+
+    public static function chasis_dropdown_fitment_modal($product_id)
+    {
+        $html = sprintf('<select class="single-product__fitment-select mb-4" id="%s" data-product_id="%s">', 'fbf-fitment-chasis-select-modal', $product_id);
         $html.= sprintf('<option value="">Select model</option>');
         $html.= '</select>';
         return $html;
