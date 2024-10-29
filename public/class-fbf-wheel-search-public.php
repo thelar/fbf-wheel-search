@@ -434,7 +434,11 @@ class Fbf_Wheel_Search_Public {
                     'group' => $pb_data['upstep'],
                 ];
 
-                $resp['pb_link_fitted'] = 'stage_1=' . urlencode(json_encode($stage_1_fitted)) . '&stage_2=' . urlencode(json_encode($stage_2)) . '&current_stage=3';
+                if($product->get_stock_quantity()<4){
+                    $resp['pb_link_fitted'] = 'false';
+                }else{
+                    $resp['pb_link_fitted'] = 'stage_1=' . urlencode(json_encode($stage_1_fitted)) . '&stage_2=' . urlencode(json_encode($stage_2)) . '&current_stage=3';
+                }
                 $resp['pb_link_nonfitted'] = 'stage_1=' . urlencode(json_encode($stage_1_nonfitted)) . '&stage_2=' . urlencode(json_encode($stage_2)) . '&current_stage=3';
             }
         }
