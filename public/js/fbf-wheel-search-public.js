@@ -182,6 +182,7 @@
 											$modal.attr('data-check-valid', true);
 											$modal_proceed.prop('disabled', false);
 											$modal_proceed.bind('click', function(){
+												$modal.attr('data-proceed', true);
 												$modal.modal('hide');
 												return false;
 											});
