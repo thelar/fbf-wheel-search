@@ -284,10 +284,23 @@ class Fbf_Wheel_Search_Public {
     public static function manufacturers_dropdown_fitment($id_override = false)
     {
         global $wpdb;
+        global $product;
         $table = $wpdb->prefix . 'fbf_vehicle_manufacturers';
         $sql = "SELECT * FROM $table WHERE enabled = 1 ORDER BY display_name";
         $manufacturers = $wpdb->get_results($sql);
         $html = '';
+        $fitment = get_post_meta($product->get_id(), '_fbf_wheel_fitment', true);
+        $manu = [];
+        if($fitment){
+            require_once plugin_dir_path(WP_PLUGIN_DIR . '/fbf-wheel-search/fbf-wheel-search.php') . 'includes/class-fbf-wheel-search-boughto-api.php';
+            $api = new \Fbf_Wheel_Search_Boughto_Api('fbf_wheel_search', 'fbf-wheel-search');
+            foreach($fitment as $fits){
+                $chassis_detail = $api->get_chassis_detail($fits);
+                if(!in_array($chassis_detail['manufacturer']['id'], $manu)){
+                    $manu[] = $chassis_detail['manufacturer']['id'];
+                }
+            }
+        }
 
         if($id_override){
             $select_id = $id_override;
@@ -298,9 +311,9 @@ class Fbf_Wheel_Search_Public {
         if(isset(WC()->session->get('fbf_last_chassis_search')['manufacturer_id'])){
             $manu_id = WC()->session->get('fbf_last_chassis_search')['manufacturer_id'];
             $chassis_id = WC()->session->get('fbf_last_chassis_search')['chassis_id'];
-            $html.= sprintf('<select class="single-product__fitment-select mb-4" id="%s" data-init_id="%s" data-chassis_id="%s">', $select_id, $manu_id, $chassis_id);
+            $html.= sprintf('<select class="single-product__fitment-select mb-4" id="%s" data-init_id="%s" data-chassis_id="%s" autocomplete="off">', $select_id, $manu_id, $chassis_id);
         }else{
-            $html.= sprintf('<select class="single-product__fitment-select mb-4" id="%s">', $select_id);
+            $html.= sprintf('<select class="single-product__fitment-select mb-4" id="%s" autocomplete="off">', $select_id);
             $manu_id = '';
         }
 
@@ -308,7 +321,9 @@ class Fbf_Wheel_Search_Public {
 
         if($manufacturers!==false){
             foreach($manufacturers as $manufacturer){
-                $html.= sprintf('<option value="%s"%s>%s</option>', $manufacturer->boughto_id, $manu_id==$manufacturer->boughto_id?' selected':'', $manufacturer->display_name);
+                if(in_array($manufacturer->boughto_id, $manu)){
+                    $html.= sprintf('<option value="%s"%s>%s</option>', $manufacturer->boughto_id, $manu_id==$manufacturer->boughto_id?' selected':'', $manufacturer->display_name);
+                }
             }
         }
         $html.= '</select>';
@@ -483,6 +498,9 @@ class Fbf_Wheel_Search_Public {
     {
         check_ajax_referer($this->option_name, 'ajax_nonce');
         $id = filter_var($_POST['manufacturer_id'], FILTER_SANITIZE_STRING);
+        if($product_id = filter_var($_POST['product_id'], FILTER_SANITIZE_STRING)){
+            $fitment = get_post_meta($product_id, '_fbf_wheel_fitment', true);
+        }
         $update_session = $_POST['update_session'];
         require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-fbf-wheel-search-boughto-api.php';
         $api = new Fbf_Wheel_Search_Boughto_Api($this->option_name, $this->plugin_name);
@@ -490,7 +508,7 @@ class Fbf_Wheel_Search_Public {
 
         if(!empty($data)){
             $i = 0;
-            foreach($data as $chassis){
+            foreach($data as $ci => $chassis){
                 $ds = DateTime::createFromFormat('Y-m-d', $chassis['generation']['start_date']);
                 $de = DateTime::createFromFormat('Y', $chassis['generation']['end_date']);
                 if($ds){
@@ -501,6 +519,13 @@ class Fbf_Wheel_Search_Public {
                 }
                 $name = str_replace(' All Engines', '', $data[$i]['chassis']['display_name']); // Remove ' All Engines' from string
                 $data[$i]['chassis']['display_name'] =  $name;
+
+                if(!empty($fitment)){
+                    if(!in_array($chassis['chassis']['id'], $fitment)){
+                        unset($data[$i]);
+                    }
+                }
+
                 $i++;
             }
         }

@@ -35,11 +35,13 @@
 			let update_session = true;
 			let is_widget = false;
 			let is_accessories = false;
+			let product_id = false;
 			if($('body').hasClass('single-landing-pages')){
 				is_landing_page = true;
 			}
 			if($('body').hasClass('single-product')){
 				update_session = false;
+				product_id = $('body').attr('data-guid');
 			}
 			if($chasis_select.hasClass('fbf-wheel-search-chassis-select-v2')){
 				is_widget = true;
@@ -53,6 +55,7 @@
 				action: 'fbf_wheel_search_get_chasis',
 				manufacturer_id: manufacturer_id,
 				ajax_nonce: fbf_wheel_search_ajax_object.ajax_nonce,
+				product_id: product_id,
 				update_session: update_session,
 			};
 			$.ajax({
