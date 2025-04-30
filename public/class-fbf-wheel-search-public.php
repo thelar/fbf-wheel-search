@@ -286,10 +286,18 @@ class Fbf_Wheel_Search_Public {
         global $wpdb;
         global $product;
         $table = $wpdb->prefix . 'fbf_vehicle_manufacturers';
+        $table_wheels = $wpdb->prefix . 'fbf_wheel_chassis';
         $sql = "SELECT * FROM $table WHERE enabled = 1 ORDER BY display_name";
         $manufacturers = $wpdb->get_results($sql);
         $html = '';
-        $fitment = get_post_meta($product->get_id(), '_fbf_wheel_fitment', true);
+        // Prefer to use wheel_chassis table over post meta
+        $q = $wpdb->prepare("SELECT * FROM {$table_wheels} WHERE wheel_id = %s", $product->get_id());
+        $r = $wpdb->get_row($q);
+        if($r){
+            $fitment = unserialize($r->chassis);
+        }else{
+            $fitment = get_post_meta($product->get_id(), '_fbf_wheel_fitment', true);
+        }
         $manu = [];
         if($fitment){
             require_once plugin_dir_path(WP_PLUGIN_DIR . '/fbf-wheel-search/fbf-wheel-search.php') . 'includes/class-fbf-wheel-search-boughto-api.php';
@@ -499,7 +507,16 @@ class Fbf_Wheel_Search_Public {
         check_ajax_referer($this->option_name, 'ajax_nonce');
         $id = filter_var($_POST['manufacturer_id'], FILTER_SANITIZE_STRING);
         if($product_id = filter_var($_POST['product_id'], FILTER_SANITIZE_STRING)){
-            $fitment = get_post_meta($product_id, '_fbf_wheel_fitment', true);
+            // Prefer to use wheel_chassis table over post meta
+            global $wpdb;
+            $t = $wpdb->prefix . 'fbf_wheel_chassis';
+            $q = $wpdb->prepare("SELECT * FROM {$t} WHERE wheel_id = %s", $product_id);
+            $r = $wpdb->get_row($q);
+            if($r){
+                $fitment = unserialize($r->chassis);
+            }else{
+                $fitment = get_post_meta($product_id, '_fbf_wheel_fitment', true);
+            }
         }
         $update_session = $_POST['update_session'];
         require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-fbf-wheel-search-boughto-api.php';
