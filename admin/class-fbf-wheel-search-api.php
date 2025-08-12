@@ -1,6 +1,6 @@
 <?php
 
-
+#[\AllowDynamicProperties]
 class Fbf_Wheel_Search_Api
 {
     private $version;

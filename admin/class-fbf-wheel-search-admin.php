@@ -20,6 +20,7 @@
  * @subpackage Fbf_Wheel_Search/admin
  * @author     Kevin Price-Ward <kevin.price-ward@chapteragency.com>
  */
+#[\AllowDynamicProperties]
 class Fbf_Wheel_Search_Admin {
 
 	/**

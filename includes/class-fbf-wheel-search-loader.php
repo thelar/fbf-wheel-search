@@ -21,6 +21,7 @@
  * @subpackage Fbf_Wheel_Search/includes
  * @author     Kevin Price-Ward <kevin.price-ward@chapteragency.com>
  */
+#[\AllowDynamicProperties]
 class Fbf_Wheel_Search_Loader {
 
 	/**
