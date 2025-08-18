@@ -209,9 +209,9 @@ class Fbf_Wheel_Search_Boughto_Api
         $transient = get_transient($key);
 
         $upsteps = $this->get_upsteps($chasis_id, $use_cache);
-        if($upsteps['response']['code']===403){ // 403 is triggered when we exceed Boughto's rate cap - just return the response itself
+        /*if($upsteps['response']['code']===403){ // 403 is triggered when we exceed Boughto's rate cap - just return the response itself
             return $upsteps;
-        }
+        }*/
 
         if(!empty($transient)&&$this->cache){
             return $transient;
