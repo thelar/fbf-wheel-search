@@ -293,8 +293,8 @@ class Fbf_Wheel_Search_Admin {
 
     public function fbf_wheel_search_enable_manufacturer()
     {
-        $action = filter_var($_POST['toggle'], FILTER_SANITIZE_STRING);
-        $id = filter_var($_POST[ $this->option_name . '_manufacturer_id'], FILTER_SANITIZE_STRING);
+        $action = strip_tags($_POST['toggle']);
+        $id = strip_tags($_POST[ $this->option_name . '_manufacturer_id']);
         $status = 'success';
         global $wpdb;
         $table = $wpdb->prefix . 'fbf_vehicle_manufacturers';
