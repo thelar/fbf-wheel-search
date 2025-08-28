@@ -505,8 +505,8 @@ class Fbf_Wheel_Search_Public {
     public function fbf_wheel_search_get_chasis()
     {
         check_ajax_referer($this->option_name, 'ajax_nonce');
-        $id = filter_var($_POST['manufacturer_id'], FILTER_SANITIZE_STRING);
-        if($product_id = filter_var($_POST['product_id'], FILTER_SANITIZE_STRING)){
+        $id = strip_tags($_POST['manufacturer_id']);
+        if($product_id = strip_tags($_POST['product_id'])){
             // Prefer to use wheel_chassis table over post meta
             global $wpdb;
             $t = $wpdb->prefix . 'fbf_wheel_chassis';
