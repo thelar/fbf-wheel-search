@@ -536,6 +536,7 @@ class Fbf_Wheel_Search_Public {
                 }
                 $name = str_replace(' All Engines', '', $data[$i]['chassis']['display_name']); // Remove ' All Engines' from string
                 $data[$i]['chassis']['display_name'] =  $name;
+				$data[$i]['chassis']['slug'] = sanitize_title($name);
 
                 if(!empty($fitment)){
                     if(!in_array($chassis['chassis']['id'], $fitment)){

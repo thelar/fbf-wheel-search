@@ -100,7 +100,8 @@
 							if(id==selected){
 								sel = ' selected';
 							}
-							option+= '<option value="' + id + '"' + sel +'>' + text + '</option>';
+							//option+= '<option value="' + id + '"' + sel +'>' + text + '</option>';
+                            option+= `<option value="${id}" data-slug="${e.chassis.slug}" ${sel}>${text}</option>`;
 						});
 						$chasis_select.empty();
 						$chasis_select.append(option);
@@ -117,14 +118,14 @@
 					if(chassis_select_id==='fbf-wheel-search-chasis-select'){
 						$manu = $('#fbf-wheel-search-manufacturer-select');
 						//console.log($manufacturer_select.val());
-						let url = '/wheel-search-results/chassis/' + $(this).val() + '/vehicle/' + encodeURIComponent($chasis_select.find(':selected').text()) + '/';
+						let url = '/wheel-search-results/chassis/' + $(this).val() + '/vehicle/' + encodeURIComponent($chasis_select.find(':selected').attr('data-slug')) + '/';
 						//console.log(url);
 						let cb = function(){window.location.href = url;}
 						mixpanel_track($chasis_select.parents('.homepage__box__content'), 'homepage', cb);
 
 					}else if(chassis_select_id==='fbf-package-search-chasis-select'){
 						$manu = $('#fbf-package-search-manufacturer-select');
-						let url = '/tyre-wheel-packages/chassis/' + $(this).val() + '/vehicle/' + $manu.val() + '/name/' + encodeURIComponent($chasis_select.find(':selected').text()) + '/';
+						let url = '/tyre-wheel-packages/chassis/' + $(this).val() + '/vehicle/' + $manu.val() + '/name/' + encodeURIComponent($chasis_select.find(':selected').attr('data-slug')) + '/';
 						//console.log(url);
 						window.location.href = url;
 					}else if(chassis_select_id==='fbf-fitment-chasis-select'||chassis_select_id==='fbf-fitment-chasis-select-modal'){
@@ -205,7 +206,7 @@
 					//let $btn = $chasis_select.parents('.form-group').next();
 					let $btn = $('.single-landing-pages__btn');
 					$btn.unbind('click'); // Removes the click event
-					let url = '/wheel-search-results/chassis/' + $(this).val() + '/vehicle/' + encodeURIComponent($chasis_select.find(':selected').text()) + '/';
+					let url = '/wheel-search-results/chassis/' + $(this).val() + '/vehicle/' + encodeURIComponent($chasis_select.find(':selected').attr('data-slug')) + '/';
 					$btn.attr('data-id', $(this).val());
 					$btn.attr('data-vehicle', encodeURIComponent($chasis_select.find(':selected').text()));
 					$btn.attr('data-url', url);
@@ -237,7 +238,7 @@
 					//console.log('accessories');
 					$postcode.prop('disabled', false);
 					//console.log($manufacturer_select.val());
-					let url = '/accessories-search-results/chassis/' + $(this).val() + '/vehicle/' + encodeURIComponent($chasis_select.find(':selected').text()) + '/';
+					let url = '/accessories-search-results/chassis/' + $(this).val() + '/vehicle/' + encodeURIComponent($chasis_select.find(':selected').attr('data-slug')) + '/';
 
 					if($(this).val().length > 0){
 						$postcode.attr('disabled', false);
@@ -395,7 +396,7 @@
 
 			if($manu_select.val()!==''&&$chassis_select.val()!==''&&$postcode.val()!==''){
 				$button.prop('disabled', false);
-				let url = '/wheel-search-results/chassis/' + $chassis_select.val() + '/vehicle/' + encodeURIComponent($chasis_select.find(':selected').text()) + '/';
+				let url = '/wheel-search-results/chassis/' + $chassis_select.val() + '/vehicle/' + encodeURIComponent($chasis_select.find(':selected').attr('data-slug')) + '/';
 				$button.unbind('click');
 				$button.bind('click', function(){
 					//console.log('wheel widget button click');
@@ -439,7 +440,7 @@
 
 			if($manu_select.val()!==''&&$chassis_select.val()!==''&&$fitting_select.val()!==''&&$postcode.val()!==''){
 				$button.prop('disabled', false);
-				let url = '/wheel-search-results/chassis/' + $chassis_select.val() + '/vehicle/' + encodeURIComponent($chasis_select.find(':selected').text()) + '/';
+				let url = '/wheel-search-results/chassis/' + $chassis_select.val() + '/vehicle/' + encodeURIComponent($chasis_select.find(':selected').attr('data-slug')) + '/';
 				$button.unbind('click');
 				$button.bind('click', function(){
 					//console.log('wheel widget button click');
@@ -494,7 +495,7 @@
 
 			if($manu_select.val()!==''&&$chassis_select.val()!==''&&$postcode.val()!==''){
 				$button.prop('disabled', false);
-				let url = '/accessories-search-results/chassis/' + $chassis_select.val() + '/vehicle/' + encodeURIComponent($chasis_select.find(':selected').text()) + '/';
+				let url = '/accessories-search-results/chassis/' + $chassis_select.val() + '/vehicle/' + encodeURIComponent($chasis_select.find(':selected').attr('data-slug')) + '/';
 				$button.unbind('click');
 				$button.bind('click', function(){
 					/*window.location.href = url;
@@ -544,6 +545,7 @@
 					manufacturer: decodeURIComponent($manu_select.find(':selected').text()),
 					chassis_id: $chassis_select.val(),
 					chassis: decodeURIComponent($chassis_select.find(':selected').text()),
+                    slug: decodeURIComponent($chassis_select.find(':selected').attr('data-slug')),
 					postcode: $postcode.val(),
 					origin: origin,
 				};
@@ -565,6 +567,7 @@
 					manufacturer: decodeURIComponent($manu_select.find(':selected').text()),
 					chassis_id: $chassis_select.val(),
 					chassis: decodeURIComponent($chasis_select.find(':selected').text()),
+                    slug: decodeURIComponent($chassis_select.find(':selected').attr('data-slug')),
 					origin: origin,
 				};
 
