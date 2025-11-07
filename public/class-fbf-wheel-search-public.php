@@ -526,6 +526,8 @@ class Fbf_Wheel_Search_Public {
         if(!empty($data)){
             $i = 0;
             foreach($data as $ci => $chassis){
+				global $wpdb;
+
                 $ds = DateTime::createFromFormat('Y-m-d', $chassis['generation']['start_date']);
                 $de = DateTime::createFromFormat('Y', $chassis['generation']['end_date']);
                 if($ds){
@@ -535,8 +537,18 @@ class Fbf_Wheel_Search_Public {
                     $data[$i]['de'] = $de->format('Y');
                 }
                 $name = str_replace(' All Engines', '', $data[$i]['chassis']['display_name']); // Remove ' All Engines' from string
+
+	            $t = $wpdb->prefix . 'fbf_manufacturer_chassis';
+	            $q = $wpdb->prepare("SELECT * FROM {$t} WHERE chassis_id = %s", $chassis['chassis']['id']);
+	            $r = $wpdb->get_row($q);
+	            if($r){
+		            $slug = $r->slug;
+	            }else{
+		            $slug = sanitize_title($name);
+	            }
+
                 $data[$i]['chassis']['display_name'] =  $name;
-				$data[$i]['chassis']['slug'] = sanitize_title($name);
+				$data[$i]['chassis']['slug'] = $slug;
 
                 if(!empty($fitment)){
                     if(!in_array($chassis['chassis']['id'], $fitment)){
