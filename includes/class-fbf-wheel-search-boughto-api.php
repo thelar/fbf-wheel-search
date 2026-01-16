@@ -380,7 +380,7 @@ class Fbf_Wheel_Search_Boughto_Api
 
 	public function tyre_sizes_sku( $chassis_id, $sku ) {
 		if($boughto_wheel = $this->get_wheel_by_sku($sku)){
-			return $this->tyre_sizes($chassis_id, $boughto_wheel['id']);
+			return $this->tyre_sizes($chassis_id, $boughto_wheel['client_wheel_product_id']);
 		}else{
 			return false;
 		}
