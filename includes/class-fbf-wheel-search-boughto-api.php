@@ -378,6 +378,14 @@ class Fbf_Wheel_Search_Boughto_Api
         return $data;
     }
 
+	public function tyre_sizes_sku( $chassis_id, $sku ) {
+		if($boughto_wheel = $this->get_wheel_by_sku($sku)){
+			return $this->tyre_sizes($chassis_id, $boughto_wheel['id']);
+		}else{
+			return false;
+		}
+	}
+
     /**
      * Check whether a given product_id (wheel) fits a chassis
      *

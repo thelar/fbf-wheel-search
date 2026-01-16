@@ -53,6 +53,11 @@ class Fbf_Wheel_Search_Api
             exit;
         }
 
+        if($wp->request == 'api/v2/pb_get_tyre_sizes_sku'){
+            $this->get_tyre_sizes_sku();
+            exit;
+        }
+
         if($wp->request == 'api/v2/pb_get_accessories'){
             $this->get_accessories(11.1);
             exit;
@@ -244,6 +249,20 @@ class Fbf_Wheel_Search_Api
 
         $this->render_json($data);
     }
+
+	private function get_tyre_sizes_sku() {
+		$chassis = $_REQUEST['chassis_id'];
+		$sku = $_REQUEST['sku'];
+		include_once(ABSPATH.'wp-admin/includes/plugin.php');
+		require_once plugin_dir_path(WP_PLUGIN_DIR . '/fbf-wheel-search/fbf-wheel-search.php') . 'includes/class-fbf-wheel-search-boughto-api.php';
+		$api = new \Fbf_Wheel_Search_Boughto_Api('fbf_wheel_search', 'fbf-wheel-search');
+		$tyres = $api->tyre_sizes_sku($chassis, $sku);
+		if($tyres['status']==='success'&&$tyres['is_staggered']===false&&!empty($tyres['tyre_sizes'])){
+			$data = $tyres['tyre_sizes'];
+		}
+
+		$this->render_json($data);
+	}
 
     private function get_accessories($pc=null)
     {
