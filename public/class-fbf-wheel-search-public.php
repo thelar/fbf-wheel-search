@@ -423,11 +423,23 @@ class Fbf_Wheel_Search_Public {
         $product_id = filter_var($_POST['product_id'], FILTER_SANITIZE_STRING);
         $vehicle = filter_var($_POST['vehicle'], FILTER_SANITIZE_STRING);
 
+
+
         require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-fbf-wheel-search-boughto-api.php';
         $api = new Fbf_Wheel_Search_Boughto_Api($this->option_name, $this->plugin_name);
         $wheel_data = $api->get_wheels($chassis_id);
         $fits = $api->wheel_fits_chassis($product_id, $chassis_id);
         $manufacturer_id = $wheel_data['manufacturer']['id'];
+
+		// Set the fbf_last_chassis_search session variable
+	    if($fits){
+		    WC()->session->set('fbf_last_chassis_search', [
+			    'manufacturer_id' => $manufacturer_id,
+			    'chassis_id' => $chassis_id,
+			    'vehicle' => $vehicle
+		    ]);
+	    }
+
         $product = wc_get_product($product_id);
         $resp = [
             'status' => 'success',
