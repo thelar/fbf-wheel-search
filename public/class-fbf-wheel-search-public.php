@@ -419,9 +419,9 @@ class Fbf_Wheel_Search_Public {
     public function fbf_wheel_fitment ()
     {
         check_ajax_referer($this->option_name, 'ajax_nonce');
-        $chassis_id = filter_var($_POST['chassis_id'], FILTER_SANITIZE_STRING);
-        $product_id = filter_var($_POST['product_id'], FILTER_SANITIZE_STRING);
-        $vehicle = filter_var($_POST['vehicle'], FILTER_SANITIZE_STRING);
+	    $chassis_id = htmlspecialchars($_POST['chassis_id'], ENT_QUOTES, 'UTF-8');
+	    $product_id = htmlspecialchars($_POST['product_id'], ENT_QUOTES, 'UTF-8');;
+	    $vehicle = htmlspecialchars($_POST['vehicle'], ENT_QUOTES, 'UTF-8');
 
 
 
