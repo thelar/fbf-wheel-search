@@ -134,7 +134,8 @@ class Fbf_Wheel_Search_Boughto_Api
         }
 
         $key = "boughto_manufacturer_{$manu_id}_chassis";
-        $transient = get_transient($key);
+        //$transient = get_transient($key);
+		$transient = $this->get_boughto_data($key);
 
         if (!empty($transient)&&$this->cache) {
             return $transient;
@@ -152,12 +153,14 @@ class Fbf_Wheel_Search_Boughto_Api
                 $data = json_decode(wp_remote_retrieve_body($response), true);
 
                 if($data['status']==='success'){
-                    set_transient($key, $data['chassis'], WEEK_IN_SECONDS);
+                    //set_transient($key, $data['chassis'], WEEK_IN_SECONDS);
+					$this->set_boughto_data($key, $data['chassis'], WEEK_IN_SECONDS);
 
                     //Set a transient that matches a chassis to manufacturer for recall in upsells
                     foreach($data['chassis'] as $chassis){
                         $key = "boughto_chassis_{$chassis['chassis']['id']}_manufacturer";
-                        set_transient($key, $manu_id, WEEK_IN_SECONDS);
+                        //set_transient($key, $manu_id, WEEK_IN_SECONDS);
+	                    $this->set_boughto_data($key, $manu_id, WEEK_IN_SECONDS);
                     }
                     return $data['chassis'];
                 }else{
@@ -174,7 +177,8 @@ class Fbf_Wheel_Search_Boughto_Api
     public function get_chassis_detail($chassis_id)
     {
         $key = "boughto_chassis_{$chassis_id}";
-        $transient = get_transient($key);
+        //$transient = get_transient($key);
+	    $transient = $this->get_boughto_data($key);
 
         if(!empty($transient)&&$this->cache){
             return $transient;
@@ -190,7 +194,8 @@ class Fbf_Wheel_Search_Boughto_Api
                 }
 
                 $data = json_decode(wp_remote_retrieve_body($response), true);
-                set_transient($key, $data, WEEK_IN_SECONDS);
+                //set_transient($key, $data, WEEK_IN_SECONDS);
+				$this->set_boughto_data($key, $data, WEEK_IN_SECONDS);
                 return $data;
             }else{
                 return $response;
@@ -206,7 +211,8 @@ class Fbf_Wheel_Search_Boughto_Api
 
         $num_results = 500;
         $key = "boughto_wheels_for_chasis_{$chasis_id}";
-        $transient = get_transient($key);
+        //$transient = get_transient($key);
+	    $transient = $this->get_boughto_data($key);
 
         $upsteps = $this->get_upsteps($chasis_id, $use_cache);
         /*if($upsteps['response']['code']===403){ // 403 is triggered when we exceed Boughto's rate cap - just return the response itself
@@ -273,7 +279,8 @@ class Fbf_Wheel_Search_Boughto_Api
                 $results = $this->process_upsteps($results, $upsteps['upsteps']);
                 //$data['results'] = $results;
                 $data['results'] = $this->simplify($results, ['product_code', 'id', 'seat_type', 'center_bore', 'family', 'upstep']); // We only need to store a fraction of the amount of data returned from boughto
-                set_transient($key, $data, WEEK_IN_SECONDS);
+                //set_transient($key, $data, WEEK_IN_SECONDS);
+				$this->set_boughto_data($key, $data, WEEK_IN_SECONDS);
                 return $data;
             }else{
                 return $response;
@@ -297,7 +304,8 @@ class Fbf_Wheel_Search_Boughto_Api
     public function get_wheels_v4($chasis_id)
     {
         $key = "boughto_v4_wheels_for_chasis_{$chasis_id}";
-        $transient = get_transient($key);
+        //$transient = get_transient($key);
+		$transient = $this->get_boughto_data($key);
 
         if(!empty($transient)&&$this->cache){
             return $transient;
@@ -307,7 +315,8 @@ class Fbf_Wheel_Search_Boughto_Api
 
             if(!is_wp_error($response)&&is_array($response)){
                 $data = json_decode(wp_remote_retrieve_body($response), true);
-                set_transient($key, $data, WEEK_IN_SECONDS);
+                //set_transient($key, $data, WEEK_IN_SECONDS);
+				$this->set_boughto_data($key, $data, WEEK_IN_SECONDS);
                 return $data;
             }else{
                 return $response;
@@ -318,7 +327,7 @@ class Fbf_Wheel_Search_Boughto_Api
     public function tyres_for_wheels($product_id, $chassis, $width, $diameter, $offset)
     {
         $wheels_data_key = "boughto_wheels_for_chasis_{$chassis}";
-        if(!$wheels_data = get_transient($wheels_data_key)){
+        if(!$wheels_data = $this->get_boughto_data($wheels_data_key)){
             $wheels_data = $this->get_wheels($chassis);
         }
         if(is_array($wheels_data) && !empty($wheels_data)){
@@ -328,7 +337,8 @@ class Fbf_Wheel_Search_Boughto_Api
         }
         if($wheel_id){
             $key = "boughto_tyre_for_wheel_{$wheel_id}_{$chassis}";
-            $transient = get_transient($key);
+            //$transient = get_transient($key);
+			$transient = $this->get_boughto_data($key);
 
             if(!empty($transient)&&$this->cache){
                 $data = $transient;
@@ -344,7 +354,8 @@ class Fbf_Wheel_Search_Boughto_Api
                 if (is_array($response)) {
                     $data = json_decode(wp_remote_retrieve_body($response), true);
                     $data['url'] = $url;
-                    set_transient($key, $data, WEEK_IN_SECONDS);
+                    //set_transient($key, $data, WEEK_IN_SECONDS);
+					$this->set_boughto_data($key, $data, WEEK_IN_SECONDS);
                 }
             }
             return $data;
@@ -356,7 +367,8 @@ class Fbf_Wheel_Search_Boughto_Api
     public function tyre_sizes($chassis, $wheel_id)
     {
         $key = "boughto_tyre_for_wheel_{$wheel_id}_{$chassis}";
-        $transient = get_transient($key);
+        //$transient = get_transient($key);
+		$transient = $this->get_boughto_data($key);
 
         if(!empty($transient)&&$this->cache){
             $data = $transient;
@@ -372,7 +384,8 @@ class Fbf_Wheel_Search_Boughto_Api
             if (is_array($response)) {
                 $data = json_decode(wp_remote_retrieve_body($response), true);
                 $data['url'] = $url;
-                set_transient($key, $data, WEEK_IN_SECONDS);
+                //set_transient($key, $data, WEEK_IN_SECONDS);
+				$this->set_boughto_data($key, $data, WEEK_IN_SECONDS);
             }
         }
         return $data;
@@ -423,7 +436,8 @@ class Fbf_Wheel_Search_Boughto_Api
             $this->cache = false;
         }
         $key = "boughto_upsteps_for_chassis_{$chassis_id}";
-        $transient = get_transient($key);
+        //$transient = get_transient($key);
+		$transient = $this->get_boughto_data($key);
 
         if(!empty($transient)&&$this->cache){
             $data = $transient;
@@ -440,7 +454,8 @@ class Fbf_Wheel_Search_Boughto_Api
 
                 $data = json_decode(wp_remote_retrieve_body($response), true);
                 $data['url'] = $url;
-                set_transient($key, $data, WEEK_IN_SECONDS);
+                //set_transient($key, $data, WEEK_IN_SECONDS);
+				$this->set_boughto_data($key, $data, WEEK_IN_SECONDS);
             }
         }
         return $data;
@@ -496,4 +511,31 @@ class Fbf_Wheel_Search_Boughto_Api
         }
         return $results;
     }
+
+	public function set_boughto_data( $key, $data, $timeout ) {
+		global $wpdb;
+		$now = microtime(true);
+		$time = $now + $timeout;
+		$date = DateTimeImmutable::createFromFormat('U.u', sprintf('%f', $time));
+		$date = $date->setTimezone(new DateTimeZone('UTC'));
+		$mysqlTimeoutValue = $date->format('Y-m-d H:i:s.u');
+		$table = $wpdb->prefix . 'fbf_boughto_data';
+		$sql = "INSERT INTO $table (boughto_key, boughto_value, timeout) VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE boughto_value = %s, timeout = %s";
+		$q = $wpdb->query( $wpdb->prepare( $sql, $key, serialize($data), $mysqlTimeoutValue, serialize($data), $mysqlTimeoutValue ) );
+	}
+
+	public function get_boughto_data( $key ) {
+		global $wpdb;
+		$table = $wpdb->prefix . 'fbf_boughto_data';
+		$sql = "SELECT * FROM $table WHERE boughto_key = %s";
+		$data = $wpdb->get_row( $wpdb->prepare( $sql, $key ) );
+		if ( empty( $data ) ) {
+			return false;
+		}
+		$timeout_time = new DateTimeImmutable( $data->timeout, new DateTimeZone( 'UTC' ) );
+		if ( $timeout_time < new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) ) ) {
+			return false;
+		}
+		return unserialize($data->boughto_value);
+	}
 }

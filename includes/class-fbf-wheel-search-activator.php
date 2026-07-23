@@ -38,6 +38,7 @@ class Fbf_Wheel_Search_Activator {
     {
         global $wpdb;
         $table_name = $wpdb->prefix . 'fbf_vehicle_manufacturers';
+        $boughto_table_name = $wpdb->prefix . 'fbf_boughto_data';
         $charset_collate = $wpdb->get_charset_collate();
 
         require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
@@ -51,7 +52,17 @@ class Fbf_Wheel_Search_Activator {
             PRIMARY KEY (id)
         ) $charset_collate";
 
+		$sql_boughto = "CREATE TABLE $boughto_table_name (
+    		id bigint(20) NOT NULL AUTO_INCREMENT,
+    		boughto_key varchar(255) NOT NULL,
+    		boughto_value longtext,
+    		timeout DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    		PRIMARY KEY (id),
+    		UNIQUE (boughto_key)
+		) $charset_collate";
+
         dbDelta($sql);
+        dbDelta($sql_boughto);
 
         add_option('fbf_wheel_search_db_version', FBF_WHEEL_SEARCH_DB_VERSION);
 	}
