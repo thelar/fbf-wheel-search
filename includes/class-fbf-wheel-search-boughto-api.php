@@ -134,8 +134,8 @@ class Fbf_Wheel_Search_Boughto_Api
         }
 
         $key = "boughto_manufacturer_{$manu_id}_chassis";
-        //$transient = get_transient($key);
-		$transient = $this->get_boughto_data($key);
+        $transient = get_transient($key);
+		//$transient = $this->get_boughto_data($key);
 
         if (!empty($transient)&&$this->cache) {
             return $transient;
@@ -177,8 +177,8 @@ class Fbf_Wheel_Search_Boughto_Api
     public function get_chassis_detail($chassis_id)
     {
         $key = "boughto_chassis_{$chassis_id}";
-        //$transient = get_transient($key);
-	    $transient = $this->get_boughto_data($key);
+        $transient = get_transient($key);
+	    //$transient = $this->get_boughto_data($key);
 
         if(!empty($transient)&&$this->cache){
             return $transient;
@@ -211,8 +211,8 @@ class Fbf_Wheel_Search_Boughto_Api
 
         $num_results = 500;
         $key = "boughto_wheels_for_chasis_{$chasis_id}";
-        //$transient = get_transient($key);
-	    $transient = $this->get_boughto_data($key);
+        $transient = get_transient($key);
+	    //$transient = $this->get_boughto_data($key);
 
         $upsteps = $this->get_upsteps($chasis_id, $use_cache);
         /*if($upsteps['response']['code']===403){ // 403 is triggered when we exceed Boughto's rate cap - just return the response itself
@@ -304,8 +304,8 @@ class Fbf_Wheel_Search_Boughto_Api
     public function get_wheels_v4($chasis_id)
     {
         $key = "boughto_v4_wheels_for_chasis_{$chasis_id}";
-        //$transient = get_transient($key);
-		$transient = $this->get_boughto_data($key);
+        $transient = get_transient($key);
+		//$transient = $this->get_boughto_data($key);
 
         if(!empty($transient)&&$this->cache){
             return $transient;
@@ -327,7 +327,8 @@ class Fbf_Wheel_Search_Boughto_Api
     public function tyres_for_wheels($product_id, $chassis, $width, $diameter, $offset)
     {
         $wheels_data_key = "boughto_wheels_for_chasis_{$chassis}";
-        if(!$wheels_data = $this->get_boughto_data($wheels_data_key)){
+	    //if(!$wheels_data = $this->get_boughto_data($wheels_data_key)){
+        if(!$wheels_data = get_transient($wheels_data_key)){
             $wheels_data = $this->get_wheels($chassis);
         }
         if(is_array($wheels_data) && !empty($wheels_data)){
@@ -337,8 +338,8 @@ class Fbf_Wheel_Search_Boughto_Api
         }
         if($wheel_id){
             $key = "boughto_tyre_for_wheel_{$wheel_id}_{$chassis}";
-            //$transient = get_transient($key);
-			$transient = $this->get_boughto_data($key);
+            $transient = get_transient($key);
+			//$transient = $this->get_boughto_data($key);
 
             if(!empty($transient)&&$this->cache){
                 $data = $transient;
@@ -367,8 +368,8 @@ class Fbf_Wheel_Search_Boughto_Api
     public function tyre_sizes($chassis, $wheel_id)
     {
         $key = "boughto_tyre_for_wheel_{$wheel_id}_{$chassis}";
-        //$transient = get_transient($key);
-		$transient = $this->get_boughto_data($key);
+        $transient = get_transient($key);
+		//$transient = $this->get_boughto_data($key);
 
         if(!empty($transient)&&$this->cache){
             $data = $transient;
@@ -436,8 +437,8 @@ class Fbf_Wheel_Search_Boughto_Api
             $this->cache = false;
         }
         $key = "boughto_upsteps_for_chassis_{$chassis_id}";
-        //$transient = get_transient($key);
-		$transient = $this->get_boughto_data($key);
+        $transient = get_transient($key);
+		//$transient = $this->get_boughto_data($key);
 
         if(!empty($transient)&&$this->cache){
             $data = $transient;
