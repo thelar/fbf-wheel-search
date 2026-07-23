@@ -440,6 +440,7 @@ class Fbf_Wheel_Search_Boughto_Api
         $transient = get_transient($key);
 		//$transient = $this->get_boughto_data($key);
 
+
         if(!empty($transient)&&$this->cache){
             $data = $transient;
         }else{
