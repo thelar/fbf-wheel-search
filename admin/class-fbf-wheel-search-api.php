@@ -282,8 +282,9 @@ class Fbf_Wheel_Search_Api
             // Pretty sure that there is an individual basket item even when same wheel is fitted to different chassis, so OK to use $wheel['wheel_chassis_id'][0]
             $chassis = $_REQUEST['chassis'];
             $trans_key = "boughto_chassis_{$chassis}_manufacturer";
-            if (get_transient($trans_key)) {
-                $manufacturer_id = get_transient($trans_key);
+            //if (get_transient($trans_key)) {
+            if ($api->get_boughto_data($trans_key)) {
+                $manufacturer_id = $api->get_boughto_data($trans_key);
             } else {
                 $manufacturer_id = WC()->session->get('fbf_manufacturer_id');
             }
