@@ -252,7 +252,7 @@ class Fbf_Wheel_Search_Boughto_Api
                         }
                     }
                 }
-                if(!is_array($results)){
+                /*if(!is_array($results)){
                     $headers = "MIME-Version: 1.0\r\n";
                     $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
                     $subject = sprintf('Chassis %s $results not array', $chasis_id);
@@ -275,7 +275,7 @@ class Fbf_Wheel_Search_Boughto_Api
                     echo '</pre>';
                     $msg.= ob_get_clean();
                     $mail = wp_mail('kevin@code-mill.co.uk', $subject, $msg, $headers);
-                }
+                }*/
                 $results = $this->process_upsteps($results, $upsteps['upsteps']);
                 //$data['results'] = $results;
                 $data['results'] = $this->simplify($results, ['product_code', 'id', 'seat_type', 'center_bore', 'family', 'upstep']); // We only need to store a fraction of the amount of data returned from boughto
@@ -487,7 +487,11 @@ class Fbf_Wheel_Search_Boughto_Api
             $new_item = [];
             foreach($item as $k => $v){
                 if(in_array($k, $keep)){
-                    $new_item[$k] = $v;
+					if($k==='product_code'){
+						$new_item[$k] = strtoupper($v); // We want to store the product code in uppercase
+					}else{
+						$new_item[$k] = $v;
+					}
                 }
             }
             $return[] = $new_item;
