@@ -196,6 +196,7 @@ class Fbf_Wheel_Search_Boughto_Api
                 $data = json_decode(wp_remote_retrieve_body($response), true);
                 //set_transient($key, $data, WEEK_IN_SECONDS);
 				$this->set_boughto_data($key, $data, WEEK_IN_SECONDS);
+				$data['api_counter'] = 1;
                 return $data;
             }else{
                 return $response;
@@ -205,6 +206,7 @@ class Fbf_Wheel_Search_Boughto_Api
 
     public function get_wheels($chasis_id, $use_cache = true)
     {
+		$api_counter = 0;
         if(!$use_cache){
             $this->cache = false;
         }
@@ -215,6 +217,8 @@ class Fbf_Wheel_Search_Boughto_Api
 	    $transient = $this->get_boughto_data($key);
 
         $upsteps = $this->get_upsteps($chasis_id, $use_cache);
+		$api_counter++;
+
         /*if($upsteps['response']['code']===403){ // 403 is triggered when we exceed Boughto's rate cap - just return the response itself
             return $upsteps;
         }*/
@@ -226,6 +230,7 @@ class Fbf_Wheel_Search_Boughto_Api
             //$url = 'https://staging.4x4tyres.co.uk/403';
 
             $response = wp_remote_get($url, $this->headers);
+			$api_counter++;
 
             if(!is_wp_error($response)&&is_array($response)){
                 if($response['response']['code']===403){ // 403 is triggered when we exceed Boughto's rate cap - just return the response itself
@@ -241,6 +246,7 @@ class Fbf_Wheel_Search_Boughto_Api
                     for($i = $data['pagination']['current_page'] + 1;$i <= $data['pagination']['total_pages']; $i++){
                         $page_url = $url . '&page=' . $i;
                         $response = wp_remote_get($page_url, $this->headers);
+						$api_counter++;
 
                         if(!is_wp_error($response)&&is_array($response)){
                             if($response['response']['code']===403){ // 403 is triggered when we exceed Boughto's rate cap - just return the response itself
@@ -281,6 +287,7 @@ class Fbf_Wheel_Search_Boughto_Api
                 $data['results'] = $this->simplify($results, ['product_code', 'id', 'seat_type', 'center_bore', 'family', 'upstep']); // We only need to store a fraction of the amount of data returned from boughto
                 //set_transient($key, $data, WEEK_IN_SECONDS);
 				$this->set_boughto_data($key, $data, WEEK_IN_SECONDS);
+				$data['api_counter'] = $api_counter;
                 return $data;
             }else{
                 return $response;
