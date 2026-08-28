@@ -516,8 +516,6 @@ class Fbf_Wheel_Search_Public {
 
     public function fbf_wheel_search_get_chasis()
     {
-		return 'test';
-		die;
         check_ajax_referer($this->option_name, 'ajax_nonce');
         $id = strip_tags($_POST['manufacturer_id']);
         if($product_id = strip_tags($_POST['product_id'])){
