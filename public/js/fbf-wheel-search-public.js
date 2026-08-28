@@ -64,6 +64,8 @@
 				data: data,
 				dataType: 'json',
 				success: function(response){
+					console.log('response');
+					console.log(response);
 					if(response.status==='success'){
 						$chasis_select.attr('disabled', false);
 						let option;
